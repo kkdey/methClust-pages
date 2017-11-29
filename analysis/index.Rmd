@@ -7,7 +7,7 @@ output:
 
 [Simulation example application of methClust](methclust_sim.html)
 
-[Application of methClust on Pott's hCh data - preliminary run](methClust_hCh.html)
+[Application of methClust on Seb's hCh data - preliminary run](methClust_hCh.html)
 
 
 ## Support
