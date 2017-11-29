@@ -192,6 +192,6 @@ freq <- topic_clus[[2]]$freq
 par(mfrow=c(2,2))
 plot(freq[,1] - median(freq[,1]), col= "red", ylab = "freq", xlab = "bins")
 plot(freq[,2] - median(freq[,2]), col= "red", ylab = "freq", xlab = "bins")
-plot(freq[,3] - median(freq[,2]), col= "red", ylab = "freq", xlab = "bins")
+plot(freq[,3] - median(freq[,3]), col= "red", ylab = "freq", xlab = "bins")
 ```
 
