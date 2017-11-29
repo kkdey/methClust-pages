@@ -5,4 +5,10 @@ output:
     toc: false
 ---
 
-[Application of methClust on Pott's hCh data - preliminary run]()
+[Application of methClust on Pott's hCh data - preliminary run](methClust_hCh.html)
+
+
+## Support
+
+For any queries related to the **methclust** package, contact Kushal K. Dey here [kkdey@uchicago.edu](kkdey@uchicago.edu)
+
