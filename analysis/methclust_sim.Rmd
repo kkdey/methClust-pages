@@ -1,0 +1,90 @@
+---
+title: 'Simulation example : methClust'
+author: "Kushal K Dey"
+date: "11/29/2017"
+output: 
+  html_document:
+    theme : cosmo
+    code_folding: hide
+---
+
+
+```{r}
+library(methClust)
+```
+
+# Example
+
+Here we present a small demo of how **methClust** can be used to fit a Grade of Membership model on a simulated example. This example will be replaced with a more appropriate real example with the further development of this package.
+
+We first define the grades of membership matrix $\omega_{N \times K}$ where $N$ is the number of samples and $K$ is the number of clusters
+
+```{r eval=TRUE, warning=FALSE, fig.align="center", fig.show="asis"}
+n.out <- 500
+omega_sim <- rbind( cbind( rep(1, n.out), rep(0, n.out)),
+                    cbind( rep(0, n.out), rep(1, n.out)),
+                    cbind( seq(0.6, 0.4, length.out = n.out),
+                           1- seq(0.6, 0.4,length.out=n.out)) )
+
+K <- dim(omega_sim)[2]
+barplot(t(omega_sim),
+        col = 2:(K+1),
+        axisnames = F, space = 0,
+        border = NA,
+        main=paste("No. of clusters=", K),
+        las=1, ylim = c(0,1), cex.axis=1.5,cex.main=1.4)
+
+```
+
+
+Next we define the cluster profiles $f_{K \times B}$ where $0 \leq f_{kb} \leq 1$ and $B$ denotes the number of genomic bins that the genome has been partitioned into.
+
+```{r}
+m.out <- 200
+freq_sim <- cbind(c(rep(0.8, m.out), rep(0.2, m.out), rep(0.5, m.out), rep(0.01, m.out)),
+                  c(rep(0.01, m.out), rep(0.01, m.out), rep(0.5, m.out), rep(0.8, m.out)))
+
+```
+
+We next define matrices for the number of methylated sites M and unmethylated sites U per sample annd per bin, which are assumed to obey Equation 1.
+
+```{r}
+prob <- omega_sim %*% t(freq_sim)
+Y <- matrix(rpois(dim(prob)[1]*dim(prob)[2], 1000), dim(prob)[1], dim(prob)[2])
+
+M <- matrix(0, dim(Y)[1], dim(Y)[2])
+
+for(m in 1:dim(Y)[1]){
+  for(n in 1:dim(Y)[2]){
+    M[m,n] <- rbinom(1, Y[m,n], prob = prob[m,n])
+  }
+}
+
+U = Y - M
+
+```
+
+Check the dimensions the methylation matrix M and the unmethylation matrix (they should be same).
+
+```{r}
+dim(M)
+dim(U)
+```
+
+Now we fit **methClust**
+
+```{r echo=TRUE, eval=TRUE}
+topics <- meth_topics(M, U, K=2, tol = 10, use_squarem = FALSE)
+```
+
+The esimated bar chart representation of the grades of membership are as follows 
+
+```{r eval=TRUE, warning=FALSE, fig.align="center", fig.show="asis"}
+barplot(t(topics$omega),
+        col = 2:(K+1),
+        axisnames = F, space = 0,
+        border = NA,
+        main=paste("No. of clusters=", K),
+        las=1, ylim = c(0,1), cex.axis=1.5,cex.main=1.4)
+```
+

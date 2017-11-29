@@ -182,3 +182,16 @@ PlotmethClust(topic_clus[[3]], factor(labels, c(6, 3, 5, 4, 8, 1, 2, 10, 7, 9)))
 PlotmethClust(topic_clus[[4]], factor(labels, c(6, 3, 5, 4, 8, 1, 2, 10, 7, 9)))
 PlotmethClust(topic_clus[[5]], factor(labels, c(6, 3, 5, 4, 8, 1, 2, 10, 7, 9)))
 ```
+
+
+## Cluster Profiles  (K=3)
+
+```{r}
+dim(topic_clus[[2]]$freq)
+freq <- topic_clus[[2]]$freq
+par(mfrow=c(2,2))
+plot(freq[,1] - median(freq[,1]), col= "red", ylab = "freq", xlab = "bins")
+plot(freq[,2] - median(freq[,2]), col= "red", ylab = "freq", xlab = "bins")
+plot(freq[,3] - median(freq[,2]), col= "red", ylab = "freq", xlab = "bins")
+```
+

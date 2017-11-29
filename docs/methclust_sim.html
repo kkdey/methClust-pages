@@ -9,9 +9,11 @@
 <meta name="generator" content="pandoc" />
 
 
+<meta name="author" content="Kushal K Dey" />
 
+<meta name="date" content="2017-11-29" />
 
-<title>Home</title>
+<title>Simulation example : methClust</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,7 +21,11 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
@@ -160,8 +166,111 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -208,18 +317,77 @@ div.section {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
 
 
-<h1 class="title toc-ignore">Home</h1>
+
+<h1 class="title toc-ignore">Simulation example : methClust</h1>
+<h4 class="author"><em>Kushal K Dey</em></h4>
+<h4 class="date"><em>11/29/2017</em></h4>
 
 </div>
 
 
-<p><a href="methclust_sim.html">Simulation example application of methClust</a></p>
-<p><a href="methClust_hCh.html">Application of methClust on Pott’s hCh data - preliminary run</a></p>
-<div id="support" class="section level2">
-<h2>Support</h2>
-<p>For any queries related to the <strong>methclust</strong> package, contact Kushal K. Dey here <a href="kkdey@uchicago.edu" class="uri">kkdey@uchicago.edu</a></p>
+<pre class="r"><code>library(methClust)</code></pre>
+<div id="example" class="section level1">
+<h1>Example</h1>
+<p>Here we present a small demo of how <strong>methClust</strong> can be used to fit a Grade of Membership model on a simulated example. This example will be replaced with a more appropriate real example with the further development of this package.</p>
+<p>We first define the grades of membership matrix <span class="math inline">\(\omega_{N \times K}\)</span> where <span class="math inline">\(N\)</span> is the number of samples and <span class="math inline">\(K\)</span> is the number of clusters</p>
+<pre class="r"><code>n.out &lt;- 500
+omega_sim &lt;- rbind( cbind( rep(1, n.out), rep(0, n.out)),
+                    cbind( rep(0, n.out), rep(1, n.out)),
+                    cbind( seq(0.6, 0.4, length.out = n.out),
+                           1- seq(0.6, 0.4,length.out=n.out)) )
+
+K &lt;- dim(omega_sim)[2]
+barplot(t(omega_sim),
+        col = 2:(K+1),
+        axisnames = F, space = 0,
+        border = NA,
+        main=paste(&quot;No. of clusters=&quot;, K),
+        las=1, ylim = c(0,1), cex.axis=1.5,cex.main=1.4)</code></pre>
+<p><img src="methclust_sim_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Next we define the cluster profiles <span class="math inline">\(f_{K \times B}\)</span> where <span class="math inline">\(0 \leq f_{kb} \leq 1\)</span> and <span class="math inline">\(B\)</span> denotes the number of genomic bins that the genome has been partitioned into.</p>
+<pre class="r"><code>m.out &lt;- 200
+freq_sim &lt;- cbind(c(rep(0.8, m.out), rep(0.2, m.out), rep(0.5, m.out), rep(0.01, m.out)),
+                  c(rep(0.01, m.out), rep(0.01, m.out), rep(0.5, m.out), rep(0.8, m.out)))</code></pre>
+<p>We next define matrices for the number of methylated sites M and unmethylated sites U per sample annd per bin, which are assumed to obey Equation 1.</p>
+<pre class="r"><code>prob &lt;- omega_sim %*% t(freq_sim)
+Y &lt;- matrix(rpois(dim(prob)[1]*dim(prob)[2], 1000), dim(prob)[1], dim(prob)[2])
+
+M &lt;- matrix(0, dim(Y)[1], dim(Y)[2])
+
+for(m in 1:dim(Y)[1]){
+  for(n in 1:dim(Y)[2]){
+    M[m,n] &lt;- rbinom(1, Y[m,n], prob = prob[m,n])
+  }
+}
+
+U = Y - M</code></pre>
+<p>Check the dimensions the methylation matrix M and the unmethylation matrix (they should be same).</p>
+<pre class="r"><code>dim(M)</code></pre>
+<pre><code>## [1] 1500  800</code></pre>
+<pre class="r"><code>dim(U)</code></pre>
+<pre><code>## [1] 1500  800</code></pre>
+<p>Now we fit <strong>methClust</strong></p>
+<pre class="r"><code>topics &lt;- meth_topics(M, U, K=2, tol = 10, use_squarem = FALSE)</code></pre>
+<pre><code>## 
+## Estimating on a 1500 samples collection.
+## log posterior increase: 112921576.8, 10933.8, 346.4, 347.9, 127.3, 38.2, 21.2, 14.6, 11.1, done.</code></pre>
+<p>The esimated bar chart representation of the grades of membership are as follows</p>
+<pre class="r"><code>barplot(t(topics$omega),
+        col = 2:(K+1),
+        axisnames = F, space = 0,
+        border = NA,
+        main=paste(&quot;No. of clusters=&quot;, K),
+        las=1, ylim = c(0,1), cex.axis=1.5,cex.main=1.4)</code></pre>
+<p><img src="methclust_sim_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
@@ -260,6 +428,8 @@ footer is added to webpages before the MathJax javascript. -->
 -->
 
 
+</div>
+</div>
 
 </div>
 

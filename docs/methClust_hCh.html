@@ -476,6 +476,17 @@ plot1</code></pre>
 <pre class="r"><code>PlotmethClust(topic_clus[[5]], factor(labels, c(6, 3, 5, 4, 8, 1, 2, 10, 7, 9)))</code></pre>
 <p><img src="methClust_hCh_files/figure-html/unnamed-chunk-13-5.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
+<div id="cluster-profiles-k3" class="section level2">
+<h2>Cluster Profiles (K=3)</h2>
+<pre class="r"><code>dim(topic_clus[[2]]$freq)</code></pre>
+<pre><code>## [1] 12905     3</code></pre>
+<pre class="r"><code>freq &lt;- topic_clus[[2]]$freq
+par(mfrow=c(2,2))
+plot(freq[,1] - median(freq[,1]), col= &quot;red&quot;, ylab = &quot;freq&quot;, xlab = &quot;bins&quot;)
+plot(freq[,2] - median(freq[,2]), col= &quot;red&quot;, ylab = &quot;freq&quot;, xlab = &quot;bins&quot;)
+plot(freq[,3] - median(freq[,2]), col= &quot;red&quot;, ylab = &quot;freq&quot;, xlab = &quot;bins&quot;)</code></pre>
+<p><img src="methClust_hCh_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
 TeX fonts only; see

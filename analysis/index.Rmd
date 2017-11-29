@@ -5,6 +5,8 @@ output:
     toc: false
 ---
 
+[Simulation example application of methClust](methclust_sim.html)
+
 [Application of methClust on Pott's hCh data - preliminary run](methClust_hCh.html)
 
 
