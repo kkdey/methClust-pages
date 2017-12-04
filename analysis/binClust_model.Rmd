@@ -1,0 +1,57 @@
+---
+title: " Grade of Membership Models for presence-absence data : Model framework"
+author: "Kushal K Dey"
+date: "12/3/2017"
+output: html_document
+---
+
+## Introduction
+
+We propose here a Grade of Membership (GoM) model tailored for Bernoulli presence - absence matrix. We discuss the algorithmic details of the EM algorithm underlying this model. In ecological abundance study, reserachers often analyse the presence - absence data matrix marking a site $i$ and a species $j$ as 1, if the site $i$ contains the species $j$ and 0 otherwise. A better alternative obviously is to report $c_{ij}$, the counts of the species $j$ in site $i$, but often this $c_{ij}$ is not known accurately.
+This is why presence-absence matrices are still considered more reliable an information for doing abundance analysis
+
+## Algorithm
+
+Consider a presence absence matrix ($U_{nb}$), such that 
+
+$$ U_{nb} \sim Ber (p_{nb}) $$
+
+where $U_{nb}$ is the indicator of whether the species $b$ is present in site $n$ and $p_{nb}$ is the corresponding probability of occurrence. In a GoM model.we assume a lower dimensional representation of the probabilities $p_{nb}$. 
+
+$$ p_{nb} = \sum_{k=1}^{K} \omega_{nk} f_{kb} $$
+
+$\omega_{nk}$ represents the grades of membership of the $n$th sample in the $k$th  cluster / profile and $f_{kb}$ represents the probability of occurrence of the species $b$ in the $k$ th cluster.
+
+For each species $b$ in site $n$, we define a latent variable $U_{nkb}$ as the indicator that a bird comes from species $b$ and site $n$ and profile $k$. 
+
+We can write 
+
+$$  U_{nb} = U_{n1b} + U_{n2b} + \cdots + U_{nKb}  $$
+
+
+where each of $U_{nkb}$ is an indicator latent variable and only one of them can be 1 and rest are all 0.
+
+
+Then given an observed $U_{nb}$, we get 
+
+$$ Pr (U_{nkb} = 1 | U_{nb} = 1) = \frac{\omega_{nk} f_{kb}}{\sum_{l} \omega_{nl} f_{lb}}  =  U_{nb} \frac{\omega_{nk} f_{kb}}{\sum_{l} \omega_{nl} f_{lb}}  = p_{nkb}$$
+$$ Pr (U_{nkb} = 0 | U_{nb} = 0) = \frac{\omega_{nk} (1 - f_{kb})}{\sum_{l} \omega_{nl} (1 - f_{lb})}  =  (1 - U_{nb}) \frac{\omega_{nk} (1 - f_{kb})}{\sum_{l} \omega_{nl} (1 - f_{lb})}  = q_{nkb}$$
+
+Note that $U_{nb}$ is observed and hence we show that the distribution of $U_{nkb}$ can be determined using the above equations given the value of $U_{nb}$.
+
+For the $t$th iteration, we can evaluate the quantities above as follows 
+
+$$  A^{(t)}_{nkb} = Pr (U^{(t)}_{nkb} = 1 | U_{nb} = 1) = U_{nb} \frac{\omega^{(t)}_{nk} f^{(t)}_{kb}}{\sum_{l} \omega^{(t)}_{nl} f^{(t)}_{lb}} $$
+
+
+$$  B^{(t)}_{nkb} = Pr (U^{(t)}_{nkb} = 0 | U_{nb} = 0) = (1 - U_{nb}) \frac{\omega^{(t)}_{nk} (1 - f^{(t)}_{kb})}{\sum_{l} \omega^{(t)}_{nl} (1 - f^{(t)}_{lb})} $$
+
+Then we can determine $\omega^{(t+1)}_{nk}$ as follows 
+
+$$ \omega^{(t+1)}_{nk} = \frac{\sum_{b} (A^{(t)}_{nkb} + B^{(t)}_{nkb} )} {\sum_{l}\sum_{b} (A^{(t)}_{nlb} + B^{(t)}_{nlb} )} = \frac{1}{U_{n+}} \sum_{b} (A^{(t)}_{nkb} + B^{(t)}_{nkb}) $$
+
+Similarly, we can get the estimates for $f^{(t+1)}_{kb}$ as 
+
+$$ f^{(t+1)}_{kb} = \frac{\sum_{n} A^{(t)}_{nkb}} {\sum_{n} (A^{(t)}_{nkb} + B^{(t)}_{nkb} )} $$
+
+

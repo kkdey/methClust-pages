@@ -1,0 +1,76 @@
+---
+title: "methClust applications (0/1 scale) - Birds data"
+author: "Kushal K Dey"
+date: "12/2/2017"
+output: html_document
+---
+
+**methClust** is designed as a generic Binomial Grade of Membership model implementing software. A specific setting includes when the data is Bernoulli - that is observed versus unoberved. An example of such a setting is the presence-absence matrix from the bird abundance data.
+
+## Loading Birds Abundance Data
+
+```{r warning = FALSE, message = FALSE}
+library(ecostructure)
+library(methClust)
+```
+
+```{r}
+data <- get(load(system.file("extdata", "HimalayanBirdsData.rda",
+                             package = "ecostructure")))
+taxonomic_counts <- t(exprs(data))
+```
+
+```{r}
+source("../../methClust/R/meth_topics.R")
+source("../../methClust/R/meth_tpx.R")
+source("../../methClust/R/meth_count.R")
+library(slam)
+```
+
+## Presence absence Data
+
+```{r}
+presence_absence <- taxonomic_counts
+presence_absence[presence_absence > 0] = 1
+absence_presence <- 1 - presence_absence
+```
+
+## Application of methClust
+
+apply **methClust** with the `presence_absence` matrix as analog to the methylation matrix and `absence_presence` matrix as analog to the unmethylation matrix.
+
+```{r eval=TRUE, warning = FALSE, message = FALSE}
+topics_list <- list()
+
+for(n in 1:100){
+set.seed(100+n)
+topics_list[[n]] <- meth_topics(presence_absence, absence_presence, 
+                      K=2, tol = 1, use_squarem = FALSE, NUM_INDICES_START = 10)
+}
+```
+
+## Visualization of methClust
+
+```{r}
+ind_max <- which.max(unlist(lapply(topics_list, function(x) return(x$L))))
+topics <- topics_list[[ind_max]]
+grid_metadata <- pData(phenoData(data))
+head(grid_metadata)
+elevation_metadata=grid_metadata$Elevation;
+east_west_dir = grid_metadata$WorE;
+omega <- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = "Elevation",
+               levels_decreasing = FALSE)
+```
+
+
+```{r}
+topics$L
+```
+
+```{r}
+sessionInfo()
+```
+

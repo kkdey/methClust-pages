@@ -9,6 +9,11 @@ output:
 
 [Application of methClust on Seb's hCh data - preliminary run](methClust_hCh.html)
 
+[Grade of Membership model for presence-absence data : A simplification of the methClust model](binClust_model.html)
+
+[Application of methClust on binary presence-absence data: Alex White Birds](ecostructure_fit.html)
+
+
 
 ## Support
 

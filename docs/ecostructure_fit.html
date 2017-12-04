@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Kushal K Dey" />
+
+
+<title>methClust applications (0/1 scale) - Birds data</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">methClust-pages</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/jdblischak/workflowr">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">methClust applications (0/1 scale) - Birds data</h1>
+<h4 class="author"><em>Kushal K Dey</em></h4>
+<h4 class="date"><em>12/2/2017</em></h4>
+
+</div>
+
+
+<p><strong>methClust</strong> is designed as a generic Binomial Grade of Membership model implementing software. A specific setting includes when the data is Bernoulli - that is observed versus unoberved. An example of such a setting is the presence-absence matrix from the bird abundance data.</p>
+<div id="loading-birds-abundance-data" class="section level2">
+<h2>Loading Birds Abundance Data</h2>
+<pre class="r"><code>library(ecostructure)
+library(methClust)</code></pre>
+<pre class="r"><code>data &lt;- get(load(system.file(&quot;extdata&quot;, &quot;HimalayanBirdsData.rda&quot;,
+                             package = &quot;ecostructure&quot;)))
+taxonomic_counts &lt;- t(exprs(data))</code></pre>
+<pre class="r"><code>source(&quot;../../methClust/R/meth_topics.R&quot;)
+source(&quot;../../methClust/R/meth_tpx.R&quot;)
+source(&quot;../../methClust/R/meth_count.R&quot;)
+library(slam)</code></pre>
+</div>
+<div id="presence-absence-data" class="section level2">
+<h2>Presence absence Data</h2>
+<pre class="r"><code>presence_absence &lt;- taxonomic_counts
+presence_absence[presence_absence &gt; 0] = 1
+absence_presence &lt;- 1 - presence_absence</code></pre>
+</div>
+<div id="application-of-methclust" class="section level2">
+<h2>Application of methClust</h2>
+<p>apply <strong>methClust</strong> with the <code>presence_absence</code> matrix as analog to the methylation matrix and <code>absence_presence</code> matrix as analog to the unmethylation matrix.</p>
+<pre class="r"><code>topics_list &lt;- list()
+
+for(n in 1:100){
+set.seed(100+n)
+topics_list[[n]] &lt;- meth_topics(presence_absence, absence_presence, 
+                      K=2, tol = 1, use_squarem = FALSE, NUM_INDICES_START = 10)
+}</code></pre>
+<pre><code>## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 6075.2, 6, 4.1, 17.2, 6.1, 8.4, 1.1, 5, 2.4, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8352.5, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 9010.1, 3.4, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7844.2, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7668.7, 1.7, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7031.1, 4.4, 3.3, 9.3, 4.7, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 13376.7, 25.3, 5.6, 10.1, 15.1, 0.8, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8852.2, 4.2, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8748.3, 11, 2.4, 1.8, 7.2, 7, 7.8, 1.3, 1.6, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7742.5, 3.5, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 6386.8, 1, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 11525.9, 1.4, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8681.3, 21.6, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 11558.9, 6.9, 5.6, 3.5, 10.6, 12.1, 3, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8482.2, 5.3, 1.1, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 9497.8, 5.7, 0.7, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8663.7, 17.5, 17.9, 1.8, 4.2, 0.8, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 9292.6, 30.4, 2.6, 9.1, 2.9, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 15657.9, 5.4, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 9318, 6.5, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8729.8, 5, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 6331.5, 2.9, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 6045.2, 1.8, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 6633.2, 2.8, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8578.3, 9.8, 15.3, 1, 1, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8643, 10.7, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 5342, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 10740.5, 0.8, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 4054.4, 2, 1.1, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 14404.5, 14.5, 4.2, 1.7, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 14666.8, 8.9, 0.6, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8659.6, 12.8, 2.4, 4.6, 8.8, 2.2, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8432.6, 7.9, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 10883.9, 2.4, 1.3, 4.5, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 11510, 4.4, 3, 8, 10, 1.7, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 9684.5, 10.7, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8320.9, 1.7, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7289.3, 3.2, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8982.3, 3.4, 2.5, 7.3, 13, 21.6, 4.3, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7827.9, 0.9, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8594.8, 7, 10.6, 13.1, 8.1, 3.1, 1.6, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 9930.3, 1.9, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 16832.9, 10.8, 3.3, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7642.3, 3.5, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 14036, 2.5, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 14700, 2.2, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 12760.8, 1.6, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7033, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8284.6, 0.9, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 10882.6, 1.7, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 10782.1, 7.2, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 10093, 9.8, 10.7, 8.6, 4.2, 3.2, 0.9, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7943.1, 6, 0.9, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 5965.9, 6.8, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8817.2, 0.6, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 9095.2, 9.1, 3.1, 5.9, 11, 7.6, 2.1, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 13637.2, 3.9, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 9556.6, 18.8, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 6332.7, 4.3, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7169.6, 1.5, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7694.3, 2.2, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 9014.6, 3.6, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8005.1, 21.9, 19.6, 6.2, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7025.4, 10.5, 1.7, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 9266, 3.2, 11.1, 4.1, 4.7, 6.1, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 11463.7, 19.9, 1.1, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8981.2, 3.5, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 6748.9, 1, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 12487.6, 10.8, 2, 12.5, 3.3, 1.9, 10.9, 0.5, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 6576.7, 8, 9.7, 8.8, 3.5, 4, 2.7, 1, 2.6, 2, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8795, 5.8, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 10075.7, 1.5, 4, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 13217.9, 31.6, 13.9, 4.2, 9.4, 15.3, 1.8, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7358.5, 3.8, 1.3, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 6772.4, 2.4, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 10776, 2.4, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 5636.7, 2.3, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 12257.6, 2.7, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 5927.8, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 11621.4, 4.5, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 10502.8, 4.4, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8652, 4, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 9714.8, 6.2, 5.4, 3.8, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 10540.4, 10.7, 0.7, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 10265, 1.4, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8845.6, 9.9, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7479.5, 6, 0.9, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7357.4, 11.9, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 11594, 1.7, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 14542.4, 3.4, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 6106.6, 1.1, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 12460.4, 2.6, 2.4, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 11652.6, 6.6, 6.8, 8.8, 3.3, 4.8, 2.3, 2.7, 2, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 8886.9, 1.2, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7059.5, 1.8, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 9585.1, 11.6, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 7536.5, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 15130.9, 4.3, 4.3, 7.7, 9.9, 14.5, 2.4, 1.8, 1.4, 8.2, 1.1, 1.4, 0.9, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 9460.9, 2.2, 5.1, 14.2, 9.9, 7.6, done.
+## 
+## Estimating on a 38 samples collection.
+## log posterior increase: 10636.6, 11.6, 5.7, 5.9, 3.9, 11.9, 10.8, 4.8, done.</code></pre>
+</div>
+<div id="visualization-of-methclust" class="section level2">
+<h2>Visualization of methClust</h2>
+<pre class="r"><code>ind_max &lt;- which.max(unlist(lapply(topics_list, function(x) return(x$L))))
+topics &lt;- topics_list[[ind_max]]
+grid_metadata &lt;- pData(phenoData(data))
+head(grid_metadata)</code></pre>
+<pre><code>##    Elevation    North     East WorE
+## A2    198.25 26.97898 92.92198    E
+## A3    734.25 27.00627 92.40457    E
+## A4   1243.25 27.02750 92.41041    E
+## A6   2629.00 27.14773 92.45938    E
+## A7   2340.25 27.09198 92.40857    E
+## A8    300.00 26.96138 93.01216    E</code></pre>
+<pre class="r"><code>elevation_metadata=grid_metadata$Elevation;
+east_west_dir = grid_metadata$WorE;
+omega &lt;- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = &quot;Elevation&quot;,
+               levels_decreasing = FALSE)</code></pre>
+<p><img src="ecostructure_fit_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>topics$L</code></pre>
+<pre><code>## [1] -2557.665</code></pre>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 3.4.2 (2017-09-28)
+## Platform: x86_64-apple-darwin15.6.0 (64-bit)
+## Running under: macOS Sierra 10.12.6
+## 
+## Matrix products: default
+## BLAS: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRblas.0.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] parallel  grid      stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
+## 
+## other attached packages:
+##  [1] slam_0.1-40           methClust_0.1.0       ecostructure_0.99.1  
+##  [4] Biobase_2.38.0        BiocGenerics_0.24.0   maptools_0.9-2       
+##  [7] SpatialExtremes_2.0-5 phytools_0.6-20       maps_3.2.0           
+## [10] ape_5.0               gridExtra_2.3         rgdal_1.2-15         
+## [13] raster_2.5-8          sp_1.2-5              maptpx_1.9-3         
+## [16] CountClust_1.5.1      ggplot2_2.2.1        
+## 
+## loaded via a namespace (and not attached):
+##  [1] viridisLite_0.2.0       splines_3.4.2          
+##  [3] gtools_3.5.0            expm_0.999-2           
+##  [5] stats4_3.4.2            latticeExtra_0.6-28    
+##  [7] animation_2.5           yaml_2.1.14            
+##  [9] numDeriv_2016.8-1       backports_1.1.0        
+## [11] lattice_0.20-35         limma_3.34.1           
+## [13] quadprog_1.5-5          phangorn_2.3.1         
+## [15] digest_0.6.12           RColorBrewer_1.1-2     
+## [17] colorspace_1.3-2        picante_1.6-2          
+## [19] cowplot_0.9.1           htmltools_0.3.6        
+## [21] Matrix_1.2-12           plyr_1.8.4             
+## [23] pkgconfig_2.0.1         mvtnorm_1.0-6          
+## [25] scales_0.5.0            tibble_1.3.4           
+## [27] combinat_0.0-8          mgcv_1.8-20            
+## [29] hexbin_1.27.1           nnet_7.3-12            
+## [31] lazyeval_0.2.1          rasterVis_0.41         
+## [33] mnormt_1.5-5            survival_2.41-3        
+## [35] magrittr_1.5            evaluate_0.10.1        
+## [37] msm_1.6.4               nlme_3.1-131           
+## [39] MASS_7.3-47             foreign_0.8-69         
+## [41] vegan_2.4-4             tools_3.4.2            
+## [43] stringr_1.2.0           munsell_0.4.3          
+## [45] cluster_2.0.6           plotrix_3.6-6          
+## [47] compiler_3.4.2          clusterGeneration_1.3.4
+## [49] rlang_0.1.4             igraph_1.1.2           
+## [51] rmarkdown_1.8           boot_1.3-20            
+## [53] gtable_0.2.0            flexmix_2.3-14         
+## [55] reshape2_1.4.2          zoo_1.8-0              
+## [57] knitr_1.17              fastmatch_1.1-0        
+## [59] rprojroot_1.2           permute_0.9-4          
+## [61] modeltools_0.2-21       stringi_1.1.5          
+## [63] SQUAREM_2017.10-1       Rcpp_0.12.13           
+## [65] scatterplot3d_0.3-40    coda_0.19-1</code></pre>
+</div>
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
