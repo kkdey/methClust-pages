@@ -5,14 +5,30 @@ output:
     toc: false
 ---
 
-[Simulation example application of methClust](methclust_sim.html)
 
-[Application of methClust on Seb's hCh data - preliminary run](methClust_hCh.html)
+[methClust](https://github.com/kkdey/methClust) is a software that fits Grade of Membership (GoM) model, much like [CountClust](https://bioconductor.org/packages/release/bioc/html/CountClust.html).
+The difference between **methClust** and **CountClust** lies in the model assumptions. **CountClust** assumes a Multinomial model for the counts for each sample and hence bases the clustering on the compositional content of the samples. **methClust** on the other hand assumes a Binomial model for the counts for each sample and ach feature and is applicable when there is a constraint on the size of the counts per cell but the total counts for a sample is not fixed. 
+
+## methClust on binary data
+
+We first apply a special elementary version **methClust** on Bernoulli or presence absence data. The immediate application it targets is ecological presence absence data of species in different sites.
 
 [Grade of Membership model for presence-absence data : A simplification of the methClust model](binClust_model.html)
 
 [Application of methClust on binary presence-absence data: Alex White Birds](ecostructure_fit.html)
 
+[Grid simulation testing with presence-absence data](methclust_grid_presence_absence.html)
+
+
+## General methClust applications (methylation examples)
+
+We now look at the model framework and applications of a more general form of **methClust**.
+
+[Model Framework](methclust_model.html)
+
+[Simulation example application of methClust](methclust_sim.html)
+
+[Application of methClust on Seb's hCh data - preliminary run](methClust_hCh.html)
 
 
 ## Support

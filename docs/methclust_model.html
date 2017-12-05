@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Visualizing methylation profiles using Grade of Membership Models</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">methClust-pages</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/jdblischak/workflowr">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Visualizing methylation profiles using Grade of Membership Models</h1>
+<h4 class="author"><em>Kushal K Dey</em></h4>
+<address class="author_afil">
+Department of Statistics, University of Chicago<br>
+</div>
+
+
+<pre class="r"><code>library(methClust)</code></pre>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>We present a Grade of Membership model for clustering samples based on the epigenetic data tracking the number of methylated and unmethylated CpG/GpC/hCh sites in genomic bins of fixed sizes across the genome. This is a companion package to the package <strong>CountClust</strong> <span class="citation">[@Dey2017]</span> designed to detect clusters based on gene expression patterns in single cells or bulk samples. In this model, we assume that each epigenetic mark in the genome comes from a specific methylation profile. However the data is recorded not at the level of a single site but rather as counts of methylated and non-methylated sites in genomic bins of fixed size. As a result, our methylation profiles will capture differences at best at the scale of a genomic bin.</p>
+</div>
+<div id="model" class="section level1">
+<h1>Model</h1>
+<p>First we present the underlying modeling framework of <strong>methClust</strong>. The basic algorithm is an EM algorithm which can be either accelerated using active set strategies or using SQUAREM acceleration <span class="citation">[@Varadhan2004]</span>.</p>
+<p>Consider a bisulfite sequencing experiment that records the number of methylated and unmethylated sites per bin across the genome. The number of methylated CpG/hCh sites in each bin <span class="math inline">\(b\)</span> of sample <span class="math inline">\(n\)</span> is assumed to follow a Binomial distribution.</p>
+<p><span class="math display">\[ M_{nb} \sim Bin \left (Y_{nb} = M_{nb} + U_{nb} , p_{nb} \right ) \]</span></p>
+<p>where <span class="math inline">\(M_{nb}\)</span> and <span class="math inline">\(U_{nb}\)</span> denote the number of methylated and unmethylated sites in bin <span class="math inline">\(b\)</span> and for sample <span class="math inline">\(n\)</span> respectively. <span class="math inline">\(p_{nb}\)</span> represents the probability of methylation, and under the Grade of Membership model assumption, <span class="math inline">\(p_{nb}\)</span> is assumed to have a lower dimensional representation.</p>
+<p><span class="math display">\[ p_{nb} = \sum_{k=1}^{K} \omega_{nk} g_{kb}  \]</span></p>
+<p><span class="math inline">\(\omega_{nk}\)</span> represents the grades of membership of the <span class="math inline">\(n\)</span>th sample in the <span class="math inline">\(k\)</span>th methylation profile and <span class="math inline">\(g_{kb}\)</span> represents the probability of methylation in bin <span class="math inline">\(b\)</span> for the <span class="math inline">\(k\)</span>th methylation profile.Note that here we assume for each cluster that the probability of methylation is same for all methylation sites in a particular bin. As a results, clusters only separate out at the scale of the genomic bins.</p>
+<p>Intuitively we assume that each bin comprises of methylations coming from one of the <span class="math inline">\(K\)</span> methylation profiles or clusters in the grade of membership model.</p>
+<p>For each CpG site <span class="math inline">\(s\)</span> in sample <span class="math inline">\(n\)</span>, we define a latent variable <span class="math inline">\(Z_{nks}\)</span> to be an indicator variable for cluster/profile <span class="math inline">\(k\)</span>.</p>
+<p><span class="math display">\[ Pr (Z_{nks} = 1 ) = \frac{\omega_{nk} g_{k, b(s)}}{\sum_{l} \omega_{nl} g_{l, b(s)}}  = p_{nk,b(s)}\]</span></p>
+<p>where <span class="math inline">\(b(s)\)</span> denotes the bin the site <span class="math inline">\(s\)</span> belongs to.</p>
+<p>Denoting by <span class="math inline">\(Y_{nb}\)</span> the total number of sites in the bin <span class="math inline">\(b\)</span>, we write</p>
+<p><span class="math display">\[ Y_{nb} = Y_{n1b} + Y_{n2b} + \cdots + Y_{nKb} \]</span></p>
+<p>where</p>
+<p><span class="math display">\[ Y_{nkb} = M_{nkb} + U_{nkb} \]</span></p>
+<p>is the total number of hCh sites in bin <span class="math inline">\(b\)</span> and sample <span class="math inline">\(n\)</span> that are assigned to the <span class="math inline">\(k\)</span> th methylation profile.</p>
+<p>Given <span class="math inline">\(Y_{nkb}\)</span>, the number of methylated sites in cluster <span class="math inline">\(k\)</span> in sample <span class="math inline">\(n\)</span> and bin <span class="math inline">\(b\)</span>, namely <span class="math inline">\(M_{nkb}\)</span> follows a Binomial distribution.</p>
+<p><span class="math display">\[ M_{nkb} | Y_{nkb}  \sim Bin (Y_{nkb}, g_{kb} ) \]</span></p>
+<p><span class="math display">\[ \left( Y_{n1b}, Y_{n2b}, \cdots, Y_{nKb} \right ) \sim Mult \left (Y_{nb} ; \omega_{n1}, \omega_{n2}, \cdots, \omega_{nK} \right )  \]</span></p>
+<p>One can show that</p>
+<p><span class="math display">\[E \left ( M_{nkb} | Y_{nb}  \right) = E \left( \left (M_{nkb} | Y^{(t)}_{nkb} \right) | Y_{nb} \right )  = E \left ( Y_{nkb} g^{(t)}_{kb} | Y_{nb} \right )  = Y_{nb} \omega^{(t)}_{nk} g^{(t)}_{kb} \]</span></p>
+<p>But we would like to compute $ E(M_{nkb} | M_{nb} ) $</p>
+<p>We know that</p>
+<p><span class="math display">\[ \sum_{k} E(M_{nkb} | M_{nb} ) = M_{nb} \]</span></p>
+<p><span class="math display">\[ E \left( M_{nb} | Y_{nb} \right) = \sum_{k=1}^{K} E \left ( M_{nkb} | Y_{nb}  \right) = Y_{nb} \sum_{l} \omega^{(t)}_{nl} g^{(t)}_{lb} \]</span></p>
+<p><span class="math display">\[ A^{(t)}_{nkb} = E \left (M_{nkb} | M_{nb}, Y_{nb} \right ) = M_{nb} \frac{\omega^{(t)}_{nk} g^{(t)}_{kb}}{\sum_{l} \omega^{(t)}_{nl} g^{(t)}_{lb} } \]</span></p>
+<p>Similarly one can show that</p>
+<p><span class="math display">\[  B^{(t)}_{nkb} = E \left (U_{nkb} | U_{nb}, Y_{nb} \right ) = U_{nb} \frac{\omega^{(t)}_{nk} (1 - g^{(t)}_{kb})}{\sum_{l} \omega^{(t)}_{nl} (1 - g^{(t)}_{lb}) }  \]</span></p>
+<p>Assume now <span class="math inline">\(M_{nkb}\)</span> and <span class="math inline">\(U_{nkb}\)</span> are the latent variables in the EM algorithm. Then the EM log-likelihood is given by</p>
+<span class="math display">\[\begin{eqnarray}
+E_{L | Data} \left [ \log Pr (Data, L | Param) \right ] &amp; = \sum_{n, b} \sum_{k} E_{U_{nkb}, M_{nkb} | M_{nb}, U_{nb}, \omega, g} \left [ \log Pr (U_{nkb}, M_{nkb}, M_{nb}, U_{nb} | \omega, g \right ]  \\
+&amp; \propto \sum_{n, b} \sum_{k}  A^{(t)}_{nkb} \times \log(\omega_{nk} g_{kb} )  + B^{(t)}_{nkb} \times \log (\omega_{nk} (1 - g_{kb} ) )    \\
+&amp; \propto \sum_{n, b} \sum_{k} \log(\omega_{nk}) (A^{(t)}_{nkb} + B^{(t)}_{nkb} ) + \log(g_{kb}) A^{(t)}_{nkb} + \log(1- g_{kb}) B^{(t)}_{nkb} \\
+\end{eqnarray}\]</span>
+<p>Optimizing for <span class="math inline">\(\omega^{(t+1)}_{nk}\)</span> under the constraint that <span class="math inline">\(\sum_{k=1}^{K} \omega^{(t+1)}_{nk} = 1\)</span>, we get</p>
+<p><span class="math display">\[ \omega^{(t+1)}_{nk} = \frac{\sum_{b} (A^{(t)}_{nkb} + B^{(t)}_{nkb} )} {\sum_{l}\sum_{b} (A^{(t)}_{nlb} + B^{(t)}_{nlb} )} = \frac{1}{Y_{n+}} \sum_{b} (A^{(t)}_{nkb} + B^{(t)}_{nkb}) \]</span></p>
+<p>where <span class="math inline">\(Y_{n+}\)</span> is the total number of sites for sample <span class="math inline">\(n\)</span>.</p>
+<p>Similarly, we can get the estimates for <span class="math inline">\(g^{(t+1)}_{kb}\)</span> as</p>
+<p><span class="math display">\[ g^{(t+1)}_{kb} = \frac{\sum_{n} A^{(t)}_{nkb}} {\sum_{n} (A^{(t)}_{nkb} + B^{(t)}_{nkb} )} \]</span></p>
+</div>
+<div id="implementation" class="section level1">
+<h1>Implementation</h1>
+<p>We now discuss the implementation of the model.</p>
+<ul>
+<li>Initialize the parameters of the model <span class="math inline">\(\omega^{(0)}_{nk}\)</span> and <span class="math inline">\(g^{(0)}_{kb}\)</span> . We draw a random subset of samples to define a cluster and compute <span class="math inline">\(g^{(0)}\)</span> values based on the mean frequency of methylation of the samples in each of the clusters. The corresponding <span class="math inline">\(\omega^{(0)}\)</span> values are computed from the linear regression of</li>
+</ul>
+<p><span class="math display">\[ log \left (\frac{M_{nb}}{U_{nb} + M_{nb}} \right ) = \omega_{N \times K}g^{(0)} _{K ]\times B} + \epsilon \]</span> which we solve to estimate <span class="math inline">\(\omega^{(0)}\)</span>.</p>
+<p>We then use the <span class="math inline">\(g^{(0)}\)</span> and <span class="math inline">\(\omega^{(0)}\)</span> values as starting points to a methClust model fit on a small sample training data to get refined estimates <span class="math inline">\(g^{(1)}\)</span> and <span class="math inline">\(\omega^{(1)}\)</span>, which then form the starting points of the EM algorithm.</p>
+<ul>
+<li>Given <span class="math inline">\(g^{(t)}\)</span> and <span class="math inline">\(\omega^{(t)}\)</span>, the values of the parameters at time <span class="math inline">\(t\)</span>, we define</li>
+</ul>
+<p><span class="math display">\[ A^{(t)}_{nkb} = M_{nb} \frac{\omega^{(t)}_{nk} g^{(t)}_{kb}}{\sum_{l} \omega^{(t)}_{nl} g^{(t)}_{lb} }  \hspace{2 cm} B^{(t)}_{nkb} = U_{nb} \frac{\omega^{(t)}_{nk} (1 - g^{(t)}_{kb})}{\sum_{l} \omega^{(t)}_{nl} (1 - g^{(t)}_{lb}) }  \]</span></p>
+<ul>
+<li>Compute new parameter estimates <span class="math inline">\(\omega^{(t+1)}\)</span> and <span class="math inline">\(g^{(t)}\)</span> as follows</li>
+</ul>
+<p><span class="math display">\[ \omega^{(t+1)}_{nk} \propto \sum_{b} (A^{(t)}_{nkb} + B^{(t)}_{nkb})  \hspace{2 cm}  g^{(t+1)}_{kb} = \frac{\sum_{n} A^{(t)}_{nkb}} {\sum_{n} (A^{(t)}_{nkb} + B^{(t)}_{nkb} )}\]</span></p>
+<ul>
+<li>We provide options to assume a slight prior on <span class="math inline">\(\omega\)</span></li>
+</ul>
+<p><span class="math display">\[ (\omega_{n1}, \omega_{n2}, \cdots, \omega_{nK}) \sim Dir \left ( \frac{1}{K}+1, \frac{1}{K} + 1, \cdots, \frac{1}{K}+ 1 \right ) \]</span></p>
+<p>which changes the EM updates for <span class="math inline">\(\omega\)</span> only slightly</p>
+<p><span class="math display">\[ \omega^{(t+1)}_{nk} \propto \sum_{b} \left (A^{(t)}_{nkb} + B^{(t)}_{nkb} + \frac{1}{K} \right ) \]</span></p>
+<ul>
+<li>We employ an acceleration on top the regular EM updates. For acceleration, we may use the SQUAREM method to perform Quasi-Newton acceleration. However, we employ a faster active set strategy, as proposed by Taddy 2012 <span class="citation">[@Taddy2012]</span>. To perform this, we compute the gradient and the Hessian (curvature) of the log posterior function with respect to the <span class="math inline">\(\omega\)</span> parameters (prior assumed to be same as above).</li>
+</ul>
+<p><span class="math display">\[ \nabla (\omega_{nk}) =  \sum_{b=1}^{B} \frac{M_{nb} g_{kb}}{\sum_{l} \omega_{nl} g_{lb}} - \sum_{b=1}^{B} \frac{U_{nb} g_{kb}}{\sum_{l} \omega_{nl} (1 - g_{lb})} + (1/K \omega_{nk})\]</span> <span class="math display">\[ Hess(\omega_{nk}, \omega_{nh}) = H_{kh} =  - \sum_{b=1}^{B} \frac{M_{nb} g_{kb}g_{hb}}{\left(\sum_{l} \omega_{nl} g_{lb} \right)^2} - \sum_{b=1}^{B} \frac{U_{nb} g_{kb}g_{hb}}{\left (\sum_{l} \omega_{nl} (1 - g_{lb}) \right)^2} + \mathbb{I}_{k=h} (1/K \omega^2_{nk})\]</span></p>
+<p>We solve for the equation for each <span class="math inline">\(n\)</span></p>
+<p><span class="math display">\[ -H \Delta_{n} + \lambda_{n} = \nabla_{n}  \hspace{1 cm} 1^{T} \Delta_{n} = 0 \]</span> where <span class="math inline">\(\Delta_{nk} = \omega_{nk} - \omega^{(t+1)}_{nk}\)</span> where <span class="math inline">\(\omega^{(t+1)}_{nk}\)</span> is the update from the EM algorithm step above. We solve this using active set strategy with the solution for <span class="math inline">\(\Delta\)</span> obtained from above equation. This results in a new update <span class="math inline">\(\omega^{(t+1)}\)</span> that satisifies</p>
+<p><span class="math display">\[ \omega^{(t+1)}_{nk} \leftarrow  \omega^{(t+1)}_{nk} + \delta_{n} \Delta_{n} \]</span></p>
+<p>where <span class="math inline">\(\delta_{n}\)</span> is the maximum value that satisfies <span class="math inline">\(\delta_{n} \Delta_{nk} &lt; - \omega^(t)_{nk}\)</span> for all <span class="math inline">\(k\)</span>.</p>
+<p>We have found this strategy to accelerate the speed of convergence compared to the regular EM updates.</p>
+<ul>
+<li>We track the log posterior</li>
+</ul>
+<span class="math display">\[\begin{align*}
+\log \mathbf{L} (M, U, \omega, g)  &amp; = \sum_{nb} M_{nb} \log \left (\sum_{k} \omega_{nk}g_{kb} \right) + \sum_{n,b} U_{nb} \log \left (\sum_{k} \omega_{nk}(1 - g_{kb}) \right)  \\
+&amp; \qquad \qquad \qquad + \frac{1}{K} \log (\omega_{nk}) + C 
+\end{align*}\]</span>
+<p>at each step and take the difference between log posteriors between each successive steps</p>
+<p><span class="math display">\[ diff (t) = \log \mathbf{L} (M, U, \omega^{(t+1)}, g^{(t+1)}) - \log \mathbf{L} (M, U, \omega^{(t)}, g^{(t)}) \]</span></p>
+<p>This difference will eventually tend to <span class="math inline">\(0\)</span> as the algorithm converges, so we set a tolerance <code>tol</code> so that the algorithm stops if at step <span class="math inline">\(t\)</span>, <span class="math inline">\(diff(t)\)</span> becomes lower than <code>tol</code>.</p>
+</div>
+<div id="example" class="section level1">
+<h1>Example</h1>
+<p>Here we present a small demo of how <strong>methClust</strong> can be used to fit a Grade of Membership model on a simulated example. This example will be replaced with a more appropriate real example with the further development of this package.</p>
+<p>We first define the grades of membership matrix <span class="math inline">\(\omega_{N \times K}\)</span> where <span class="math inline">\(N\)</span> is the number of samples and <span class="math inline">\(K\)</span> is the number of clusters</p>
+<pre class="r"><code>n.out &lt;- 500
+omega_sim &lt;- rbind( cbind( rep(1, n.out), rep(0, n.out)),
+                    cbind( rep(0, n.out), rep(1, n.out)),
+                    cbind( seq(0.6, 0.4, length.out = n.out),
+                           1- seq(0.6, 0.4,length.out=n.out)) )
+
+K &lt;- dim(omega_sim)[2]
+barplot(t(omega_sim),
+        col = 2:(K+1),
+        axisnames = F, space = 0,
+        border = NA,
+        main=paste(&quot;No. of clusters=&quot;, K),
+        las=1, ylim = c(0,1), cex.axis=1.5,cex.main=1.4)</code></pre>
+<p><img src="methclust_model_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Next we define the cluster profiles <span class="math inline">\(f_{K \times B}\)</span> where $ 0 f_{kb} 1$ and <span class="math inline">\(B\)</span> denotes the number of genomic bins that the genome has been partitioned into.</p>
+<pre class="r"><code>m.out &lt;- 200
+freq_sim &lt;- cbind(c(rep(0.8, m.out), rep(0.2, m.out), rep(0.5, m.out), rep(0.01, m.out)),
+                  c(rep(0.01, m.out), rep(0.01, m.out), rep(0.5, m.out), rep(0.8, m.out)))</code></pre>
+<p>We next define matrices for the number of methylated sites <span class="math inline">\(M\)</span> and unmethylated sites <span class="math inline">\(U\)</span> per sample annd per bin, which are assumed to obey Equation 1.</p>
+<pre class="r"><code>prob &lt;- omega_sim %*% t(freq_sim)
+Y &lt;- matrix(rpois(dim(prob)[1]*dim(prob)[2], 1000), dim(prob)[1], dim(prob)[2])
+
+M &lt;- matrix(0, dim(Y)[1], dim(Y)[2])
+
+for(m in 1:dim(Y)[1]){
+  for(n in 1:dim(Y)[2]){
+    M[m,n] &lt;- rbinom(1, Y[m,n], prob = prob[m,n])
+  }
+}
+
+U = Y - M</code></pre>
+<p>We now fit the  function in <strong>methclust</strong> taking the matrices of the counts of methylated sites and unmethylated sites across the genomic bins for each sample and <span class="math inline">\(K\)</span> as in the number of clusters.</p>
+<pre class="r"><code>topics &lt;- meth_topics(M, U, K=2, tol = 10, use_squarem = FALSE)</code></pre>
+<pre><code>## 
+## Estimating on a 1500 samples collection.
+## log posterior increase: 67655205.3, 70545.4, 182.7, 172, 66.8, 19.8, 10.9, done.</code></pre>
+<p>the <code>use_squarem = FALSE</code> option uses the active set strategy due to Taddy et al 2012 <span class="citation">[@Taddy2012]</span>, while the <code>use_squarem=TRUE</code> uses the SQUAREM implementation <span class="citation">[@Varadhan2004]</span> which has been found to be slighlt slower in comparison.  indicates the threshold for the difference in posterior in consecutive iterations of the EM algorithm.</p>
+<p>The output  is a list consisting of the fitted <span class="math inline">\(\omega\)</span> and <span class="math inline">\(freq\)</span> matrices, as well as the the log posterior of the resulting fit.</p>
+<pre class="r"><code>topics$omega[1:2,]</code></pre>
+<pre><code>##         topic
+## document           1         2
+##    doc 1 0.008680722 0.9913193
+##    doc 2 0.009211811 0.9907882</code></pre>
+<pre class="r"><code>topics$theta[1:2,]</code></pre>
+<pre><code>## NULL</code></pre>
+<pre class="r"><code>topics$L</code></pre>
+<pre><code>## [1] -542546729</code></pre>
+<p>The estimated grades of membership matrix <code>topics$omega</code> was observed to match the true grade of membership matrix <code>omega_sim</code> closely, thereby serving as a validation of the model implementation.</p>
+<pre class="r"><code>barplot(t(topics$omega),
+        col = 2:(K+1),
+        axisnames = F, space = 0,
+        border = NA,
+        main=paste(&quot;No. of clusters=&quot;, K),
+        las=1, ylim = c(0,1), cex.axis=1.5,cex.main=1.4)</code></pre>
+<p><img src="methclust_model_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

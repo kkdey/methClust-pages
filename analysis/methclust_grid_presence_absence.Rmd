@@ -11,6 +11,9 @@ We design a grid of presence and absence values and then test the **binClust** m
 library(methClust)
 ```
 
+
+We try to build a block matrix that mimics a presence-absence structure of bird species along the two sides of the Wallace line. We assume that the first 500 locations fall in region A and there are 100 bird species in this region - hence they are present in all of these 500 locations. We also assume that there are 300 locations in region B, which has its own set of species that are present in each of these 300 locations. Apart from that, there are some species that are present in region A as well as region C, which is in the middle of regions A and B, and then some species that are present in region C and region B but not in A. 
+
 ```{r}
 block <- matrix(0, 1000, 300)
 block[1:500, 1:100] <- matrix(1, 500, 100)

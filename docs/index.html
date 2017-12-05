@@ -215,10 +215,21 @@ div.section {
 </div>
 
 
-<p><a href="methclust_sim.html">Simulation example application of methClust</a></p>
-<p><a href="methClust_hCh.html">Application of methClust on Seb’s hCh data - preliminary run</a></p>
+<p><a href="https://github.com/kkdey/methClust">methClust</a> is a software that fits Grade of Membership (GoM) model, much like <a href="https://bioconductor.org/packages/release/bioc/html/CountClust.html">CountClust</a>. The difference between <strong>methClust</strong> and <strong>CountClust</strong> lies in the model assumptions. <strong>CountClust</strong> assumes a Multinomial model for the counts for each sample and hence bases the clustering on the compositional content of the samples. <strong>methClust</strong> on the other hand assumes a Binomial model for the counts for each sample and ach feature and is applicable when there is a constraint on the size of the counts per cell but the total counts for a sample is not fixed.</p>
+<div id="methclust-on-binary-data" class="section level2">
+<h2>methClust on binary data</h2>
+<p>We first apply a special elementary version <strong>methClust</strong> on Bernoulli or presence absence data. The immediate application it targets is ecological presence absence data of species in different sites.</p>
 <p><a href="binClust_model.html">Grade of Membership model for presence-absence data : A simplification of the methClust model</a></p>
 <p><a href="ecostructure_fit.html">Application of methClust on binary presence-absence data: Alex White Birds</a></p>
+<p><a href="methclust_grid_presence_absence.html">Grid simulation testing with presence-absence data</a></p>
+</div>
+<div id="general-methclust-applications-methylation-examples" class="section level2">
+<h2>General methClust applications (methylation examples)</h2>
+<p>We now look at the model framework and applications of a more general form of <strong>methClust</strong>.</p>
+<p><a href="methclust_model.html">Model Framework</a></p>
+<p><a href="methclust_sim.html">Simulation example application of methClust</a></p>
+<p><a href="methClust_hCh.html">Application of methClust on Seb’s hCh data - preliminary run</a></p>
+</div>
 <div id="support" class="section level2">
 <h2>Support</h2>
 <p>For any queries related to the <strong>methclust</strong> package, contact Kushal K. Dey here <a href="kkdey@uchicago.edu" class="uri">kkdey@uchicago.edu</a></p>
