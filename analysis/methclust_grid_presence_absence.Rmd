@@ -1,0 +1,41 @@
+---
+title: "Grid simulation :presence absence GoM"
+author: "Kushal K Dey"
+date: "12/5/2017"
+output: html_document
+---
+
+We design a grid of presence and absence values and then test the **binClust** model on the corresponding data to check if the estimated clusters conform with the expected blocks in the grid.
+
+```{r}
+library(methClust)
+```
+
+```{r}
+block <- matrix(0, 1000, 300)
+block[1:500, 1:100] <- matrix(1, 500, 100)
+block[1:700, 101:150] <- matrix(1, 700, 50)
+block[501:1000, 151:200] <- matrix(1, 500, 50)
+block[701:1000, 201:300] <- matrix(1, 300, 100)
+```
+
+```{r}
+topics <- meth_topics(block, 1- block, 
+            K=2, tol = 1, use_squarem = FALSE, NUM_INDICES_START = 150)
+```
+
+```{r}
+K <- 2
+barplot(t(topics$omega),
+        col = 2:(K+1),
+        axisnames = F, space = 0,
+        border = NA,
+        main=paste("No. of clusters=", K),
+        las=1, ylim = c(0,1), cex.axis=1.5,cex.main=1.4)
+```
+
+```{r}
+plot(topics$freq[,1])
+plot(topics$freq[,2])
+```
+

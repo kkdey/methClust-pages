@@ -1,0 +1,2411 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Kushal K Dey" />
+
+
+<title>Grid simulation :presence absence GoM</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">methClust-pages</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/jdblischak/workflowr">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Grid simulation :presence absence GoM</h1>
+<h4 class="author"><em>Kushal K Dey</em></h4>
+<h4 class="date"><em>12/5/2017</em></h4>
+
+</div>
+
+
+<p>We design a grid of presence and absence values and then test the <strong>binClust</strong> model on the corresponding data to check if the estimated clusters conform with the expected blocks in the grid.</p>
+<pre class="r"><code>library(methClust)</code></pre>
+<pre class="r"><code>block &lt;- matrix(0, 1000, 300)
+block[1:500, 1:100] &lt;- matrix(1, 500, 100)
+block[1:700, 101:150] &lt;- matrix(1, 700, 50)
+block[501:1000, 151:200] &lt;- matrix(1, 500, 50)
+block[701:1000, 201:300] &lt;- matrix(1, 300, 100)</code></pre>
+<pre class="r"><code>topics &lt;- meth_topics(block, 1- block, 
+            K=2, tol = 1, use_squarem = FALSE, NUM_INDICES_START = 150)</code></pre>
+<pre><code>## 
+## Estimating on a 1000 samples collection.
+## trouble in wsolve
+## Failed to converge for omega at i = 1
+## trouble in wsolve
+## Failed to converge for omega at i = 2
+## trouble in wsolve
+## Failed to converge for omega at i = 3
+## trouble in wsolve
+## Failed to converge for omega at i = 4
+## trouble in wsolve
+## Failed to converge for omega at i = 5
+## trouble in wsolve
+## Failed to converge for omega at i = 6
+## trouble in wsolve
+## Failed to converge for omega at i = 7
+## trouble in wsolve
+## Failed to converge for omega at i = 8
+## trouble in wsolve
+## Failed to converge for omega at i = 9
+## trouble in wsolve
+## Failed to converge for omega at i = 10
+## trouble in wsolve
+## Failed to converge for omega at i = 11
+## trouble in wsolve
+## Failed to converge for omega at i = 12
+## trouble in wsolve
+## Failed to converge for omega at i = 13
+## trouble in wsolve
+## Failed to converge for omega at i = 14
+## trouble in wsolve
+## Failed to converge for omega at i = 15
+## trouble in wsolve
+## Failed to converge for omega at i = 16
+## trouble in wsolve
+## Failed to converge for omega at i = 17
+## trouble in wsolve
+## Failed to converge for omega at i = 18
+## trouble in wsolve
+## Failed to converge for omega at i = 19
+## trouble in wsolve
+## Failed to converge for omega at i = 20
+## trouble in wsolve
+## Failed to converge for omega at i = 21
+## trouble in wsolve
+## Failed to converge for omega at i = 22
+## trouble in wsolve
+## Failed to converge for omega at i = 23
+## trouble in wsolve
+## Failed to converge for omega at i = 24
+## trouble in wsolve
+## Failed to converge for omega at i = 25
+## trouble in wsolve
+## Failed to converge for omega at i = 26
+## trouble in wsolve
+## Failed to converge for omega at i = 27
+## trouble in wsolve
+## Failed to converge for omega at i = 28
+## trouble in wsolve
+## Failed to converge for omega at i = 29
+## trouble in wsolve
+## Failed to converge for omega at i = 30
+## trouble in wsolve
+## Failed to converge for omega at i = 31
+## trouble in wsolve
+## Failed to converge for omega at i = 32
+## trouble in wsolve
+## Failed to converge for omega at i = 33
+## trouble in wsolve
+## Failed to converge for omega at i = 34
+## trouble in wsolve
+## Failed to converge for omega at i = 35
+## trouble in wsolve
+## Failed to converge for omega at i = 36
+## trouble in wsolve
+## Failed to converge for omega at i = 37
+## trouble in wsolve
+## Failed to converge for omega at i = 38
+## trouble in wsolve
+## Failed to converge for omega at i = 39
+## trouble in wsolve
+## Failed to converge for omega at i = 40
+## trouble in wsolve
+## Failed to converge for omega at i = 41
+## trouble in wsolve
+## Failed to converge for omega at i = 42
+## trouble in wsolve
+## Failed to converge for omega at i = 43
+## trouble in wsolve
+## Failed to converge for omega at i = 44
+## trouble in wsolve
+## Failed to converge for omega at i = 45
+## trouble in wsolve
+## Failed to converge for omega at i = 46
+## trouble in wsolve
+## Failed to converge for omega at i = 47
+## trouble in wsolve
+## Failed to converge for omega at i = 48
+## trouble in wsolve
+## Failed to converge for omega at i = 49
+## trouble in wsolve
+## Failed to converge for omega at i = 50
+## trouble in wsolve
+## Failed to converge for omega at i = 51
+## trouble in wsolve
+## Failed to converge for omega at i = 52
+## trouble in wsolve
+## Failed to converge for omega at i = 53
+## trouble in wsolve
+## Failed to converge for omega at i = 54
+## trouble in wsolve
+## Failed to converge for omega at i = 55
+## trouble in wsolve
+## Failed to converge for omega at i = 56
+## trouble in wsolve
+## Failed to converge for omega at i = 57
+## trouble in wsolve
+## Failed to converge for omega at i = 58
+## trouble in wsolve
+## Failed to converge for omega at i = 59
+## trouble in wsolve
+## Failed to converge for omega at i = 60
+## trouble in wsolve
+## Failed to converge for omega at i = 61
+## trouble in wsolve
+## Failed to converge for omega at i = 62
+## trouble in wsolve
+## Failed to converge for omega at i = 63
+## trouble in wsolve
+## Failed to converge for omega at i = 64
+## trouble in wsolve
+## Failed to converge for omega at i = 65
+## trouble in wsolve
+## Failed to converge for omega at i = 66
+## trouble in wsolve
+## Failed to converge for omega at i = 67
+## trouble in wsolve
+## Failed to converge for omega at i = 68
+## trouble in wsolve
+## Failed to converge for omega at i = 69
+## trouble in wsolve
+## Failed to converge for omega at i = 70
+## trouble in wsolve
+## Failed to converge for omega at i = 71
+## trouble in wsolve
+## Failed to converge for omega at i = 72
+## trouble in wsolve
+## Failed to converge for omega at i = 73
+## trouble in wsolve
+## Failed to converge for omega at i = 74
+## trouble in wsolve
+## Failed to converge for omega at i = 75
+## trouble in wsolve
+## Failed to converge for omega at i = 76
+## trouble in wsolve
+## Failed to converge for omega at i = 77
+## trouble in wsolve
+## Failed to converge for omega at i = 78
+## trouble in wsolve
+## Failed to converge for omega at i = 79
+## trouble in wsolve
+## Failed to converge for omega at i = 80
+## trouble in wsolve
+## Failed to converge for omega at i = 81
+## trouble in wsolve
+## Failed to converge for omega at i = 82
+## trouble in wsolve
+## Failed to converge for omega at i = 83
+## trouble in wsolve
+## Failed to converge for omega at i = 84
+## trouble in wsolve
+## Failed to converge for omega at i = 85
+## trouble in wsolve
+## Failed to converge for omega at i = 86
+## trouble in wsolve
+## Failed to converge for omega at i = 87
+## trouble in wsolve
+## Failed to converge for omega at i = 88
+## trouble in wsolve
+## Failed to converge for omega at i = 89
+## trouble in wsolve
+## Failed to converge for omega at i = 90
+## trouble in wsolve
+## Failed to converge for omega at i = 91
+## trouble in wsolve
+## Failed to converge for omega at i = 92
+## trouble in wsolve
+## Failed to converge for omega at i = 93
+## trouble in wsolve
+## Failed to converge for omega at i = 94
+## trouble in wsolve
+## Failed to converge for omega at i = 95
+## trouble in wsolve
+## Failed to converge for omega at i = 96
+## trouble in wsolve
+## Failed to converge for omega at i = 97
+## trouble in wsolve
+## Failed to converge for omega at i = 98
+## trouble in wsolve
+## Failed to converge for omega at i = 99
+## trouble in wsolve
+## Failed to converge for omega at i = 100
+## trouble in wsolve
+## Failed to converge for omega at i = 101
+## trouble in wsolve
+## Failed to converge for omega at i = 102
+## trouble in wsolve
+## Failed to converge for omega at i = 103
+## trouble in wsolve
+## Failed to converge for omega at i = 104
+## trouble in wsolve
+## Failed to converge for omega at i = 105
+## trouble in wsolve
+## Failed to converge for omega at i = 106
+## trouble in wsolve
+## Failed to converge for omega at i = 107
+## trouble in wsolve
+## Failed to converge for omega at i = 108
+## trouble in wsolve
+## Failed to converge for omega at i = 109
+## trouble in wsolve
+## Failed to converge for omega at i = 110
+## trouble in wsolve
+## Failed to converge for omega at i = 111
+## trouble in wsolve
+## Failed to converge for omega at i = 112
+## trouble in wsolve
+## Failed to converge for omega at i = 113
+## trouble in wsolve
+## Failed to converge for omega at i = 114
+## trouble in wsolve
+## Failed to converge for omega at i = 115
+## trouble in wsolve
+## Failed to converge for omega at i = 116
+## trouble in wsolve
+## Failed to converge for omega at i = 117
+## trouble in wsolve
+## Failed to converge for omega at i = 118
+## trouble in wsolve
+## Failed to converge for omega at i = 119
+## trouble in wsolve
+## Failed to converge for omega at i = 120
+## trouble in wsolve
+## Failed to converge for omega at i = 121
+## trouble in wsolve
+## Failed to converge for omega at i = 122
+## trouble in wsolve
+## Failed to converge for omega at i = 123
+## trouble in wsolve
+## Failed to converge for omega at i = 124
+## trouble in wsolve
+## Failed to converge for omega at i = 125
+## trouble in wsolve
+## Failed to converge for omega at i = 126
+## trouble in wsolve
+## Failed to converge for omega at i = 127
+## trouble in wsolve
+## Failed to converge for omega at i = 128
+## trouble in wsolve
+## Failed to converge for omega at i = 129
+## trouble in wsolve
+## Failed to converge for omega at i = 130
+## trouble in wsolve
+## Failed to converge for omega at i = 131
+## trouble in wsolve
+## Failed to converge for omega at i = 132
+## trouble in wsolve
+## Failed to converge for omega at i = 133
+## trouble in wsolve
+## Failed to converge for omega at i = 134
+## trouble in wsolve
+## Failed to converge for omega at i = 135
+## trouble in wsolve
+## Failed to converge for omega at i = 136
+## trouble in wsolve
+## Failed to converge for omega at i = 137
+## trouble in wsolve
+## Failed to converge for omega at i = 138
+## trouble in wsolve
+## Failed to converge for omega at i = 139
+## trouble in wsolve
+## Failed to converge for omega at i = 140
+## trouble in wsolve
+## Failed to converge for omega at i = 141
+## trouble in wsolve
+## Failed to converge for omega at i = 142
+## trouble in wsolve
+## Failed to converge for omega at i = 143
+## trouble in wsolve
+## Failed to converge for omega at i = 144
+## trouble in wsolve
+## Failed to converge for omega at i = 145
+## trouble in wsolve
+## Failed to converge for omega at i = 146
+## trouble in wsolve
+## Failed to converge for omega at i = 147
+## trouble in wsolve
+## Failed to converge for omega at i = 148
+## trouble in wsolve
+## Failed to converge for omega at i = 149
+## trouble in wsolve
+## Failed to converge for omega at i = 150
+## trouble in wsolve
+## Failed to converge for omega at i = 151
+## trouble in wsolve
+## Failed to converge for omega at i = 152
+## trouble in wsolve
+## Failed to converge for omega at i = 153
+## trouble in wsolve
+## Failed to converge for omega at i = 154
+## trouble in wsolve
+## Failed to converge for omega at i = 155
+## trouble in wsolve
+## Failed to converge for omega at i = 156
+## trouble in wsolve
+## Failed to converge for omega at i = 157
+## trouble in wsolve
+## Failed to converge for omega at i = 158
+## trouble in wsolve
+## Failed to converge for omega at i = 159
+## trouble in wsolve
+## Failed to converge for omega at i = 160
+## trouble in wsolve
+## Failed to converge for omega at i = 161
+## trouble in wsolve
+## Failed to converge for omega at i = 162
+## trouble in wsolve
+## Failed to converge for omega at i = 163
+## trouble in wsolve
+## Failed to converge for omega at i = 164
+## trouble in wsolve
+## Failed to converge for omega at i = 165
+## trouble in wsolve
+## Failed to converge for omega at i = 166
+## trouble in wsolve
+## Failed to converge for omega at i = 167
+## trouble in wsolve
+## Failed to converge for omega at i = 168
+## trouble in wsolve
+## Failed to converge for omega at i = 169
+## trouble in wsolve
+## Failed to converge for omega at i = 170
+## trouble in wsolve
+## Failed to converge for omega at i = 171
+## trouble in wsolve
+## Failed to converge for omega at i = 172
+## trouble in wsolve
+## Failed to converge for omega at i = 173
+## trouble in wsolve
+## Failed to converge for omega at i = 174
+## trouble in wsolve
+## Failed to converge for omega at i = 175
+## trouble in wsolve
+## Failed to converge for omega at i = 176
+## trouble in wsolve
+## Failed to converge for omega at i = 177
+## trouble in wsolve
+## Failed to converge for omega at i = 178
+## trouble in wsolve
+## Failed to converge for omega at i = 179
+## trouble in wsolve
+## Failed to converge for omega at i = 180
+## trouble in wsolve
+## Failed to converge for omega at i = 181
+## trouble in wsolve
+## Failed to converge for omega at i = 182
+## trouble in wsolve
+## Failed to converge for omega at i = 183
+## trouble in wsolve
+## Failed to converge for omega at i = 184
+## trouble in wsolve
+## Failed to converge for omega at i = 185
+## trouble in wsolve
+## Failed to converge for omega at i = 186
+## trouble in wsolve
+## Failed to converge for omega at i = 187
+## trouble in wsolve
+## Failed to converge for omega at i = 188
+## trouble in wsolve
+## Failed to converge for omega at i = 189
+## trouble in wsolve
+## Failed to converge for omega at i = 190
+## trouble in wsolve
+## Failed to converge for omega at i = 191
+## trouble in wsolve
+## Failed to converge for omega at i = 192
+## trouble in wsolve
+## Failed to converge for omega at i = 193
+## trouble in wsolve
+## Failed to converge for omega at i = 194
+## trouble in wsolve
+## Failed to converge for omega at i = 195
+## trouble in wsolve
+## Failed to converge for omega at i = 196
+## trouble in wsolve
+## Failed to converge for omega at i = 197
+## trouble in wsolve
+## Failed to converge for omega at i = 198
+## trouble in wsolve
+## Failed to converge for omega at i = 199
+## trouble in wsolve
+## Failed to converge for omega at i = 200
+## trouble in wsolve
+## Failed to converge for omega at i = 201
+## trouble in wsolve
+## Failed to converge for omega at i = 202
+## trouble in wsolve
+## Failed to converge for omega at i = 203
+## trouble in wsolve
+## Failed to converge for omega at i = 204
+## trouble in wsolve
+## Failed to converge for omega at i = 205
+## trouble in wsolve
+## Failed to converge for omega at i = 206
+## trouble in wsolve
+## Failed to converge for omega at i = 207
+## trouble in wsolve
+## Failed to converge for omega at i = 208
+## trouble in wsolve
+## Failed to converge for omega at i = 209
+## trouble in wsolve
+## Failed to converge for omega at i = 210
+## trouble in wsolve
+## Failed to converge for omega at i = 211
+## trouble in wsolve
+## Failed to converge for omega at i = 212
+## trouble in wsolve
+## Failed to converge for omega at i = 213
+## trouble in wsolve
+## Failed to converge for omega at i = 214
+## trouble in wsolve
+## Failed to converge for omega at i = 215
+## trouble in wsolve
+## Failed to converge for omega at i = 216
+## trouble in wsolve
+## Failed to converge for omega at i = 217
+## trouble in wsolve
+## Failed to converge for omega at i = 218
+## trouble in wsolve
+## Failed to converge for omega at i = 219
+## trouble in wsolve
+## Failed to converge for omega at i = 220
+## trouble in wsolve
+## Failed to converge for omega at i = 221
+## trouble in wsolve
+## Failed to converge for omega at i = 222
+## trouble in wsolve
+## Failed to converge for omega at i = 223
+## trouble in wsolve
+## Failed to converge for omega at i = 224
+## trouble in wsolve
+## Failed to converge for omega at i = 225
+## trouble in wsolve
+## Failed to converge for omega at i = 226
+## trouble in wsolve
+## Failed to converge for omega at i = 227
+## trouble in wsolve
+## Failed to converge for omega at i = 228
+## trouble in wsolve
+## Failed to converge for omega at i = 229
+## trouble in wsolve
+## Failed to converge for omega at i = 230
+## trouble in wsolve
+## Failed to converge for omega at i = 231
+## trouble in wsolve
+## Failed to converge for omega at i = 232
+## trouble in wsolve
+## Failed to converge for omega at i = 233
+## trouble in wsolve
+## Failed to converge for omega at i = 234
+## trouble in wsolve
+## Failed to converge for omega at i = 235
+## trouble in wsolve
+## Failed to converge for omega at i = 236
+## trouble in wsolve
+## Failed to converge for omega at i = 237
+## trouble in wsolve
+## Failed to converge for omega at i = 238
+## trouble in wsolve
+## Failed to converge for omega at i = 239
+## trouble in wsolve
+## Failed to converge for omega at i = 240
+## trouble in wsolve
+## Failed to converge for omega at i = 241
+## trouble in wsolve
+## Failed to converge for omega at i = 242
+## trouble in wsolve
+## Failed to converge for omega at i = 243
+## trouble in wsolve
+## Failed to converge for omega at i = 244
+## trouble in wsolve
+## Failed to converge for omega at i = 245
+## trouble in wsolve
+## Failed to converge for omega at i = 246
+## trouble in wsolve
+## Failed to converge for omega at i = 247
+## trouble in wsolve
+## Failed to converge for omega at i = 248
+## trouble in wsolve
+## Failed to converge for omega at i = 249
+## trouble in wsolve
+## Failed to converge for omega at i = 250
+## trouble in wsolve
+## Failed to converge for omega at i = 251
+## trouble in wsolve
+## Failed to converge for omega at i = 252
+## trouble in wsolve
+## Failed to converge for omega at i = 253
+## trouble in wsolve
+## Failed to converge for omega at i = 254
+## trouble in wsolve
+## Failed to converge for omega at i = 255
+## trouble in wsolve
+## Failed to converge for omega at i = 256
+## trouble in wsolve
+## Failed to converge for omega at i = 257
+## trouble in wsolve
+## Failed to converge for omega at i = 258
+## trouble in wsolve
+## Failed to converge for omega at i = 259
+## trouble in wsolve
+## Failed to converge for omega at i = 260
+## trouble in wsolve
+## Failed to converge for omega at i = 261
+## trouble in wsolve
+## Failed to converge for omega at i = 262
+## trouble in wsolve
+## Failed to converge for omega at i = 263
+## trouble in wsolve
+## Failed to converge for omega at i = 264
+## trouble in wsolve
+## Failed to converge for omega at i = 265
+## trouble in wsolve
+## Failed to converge for omega at i = 266
+## trouble in wsolve
+## Failed to converge for omega at i = 267
+## trouble in wsolve
+## Failed to converge for omega at i = 268
+## trouble in wsolve
+## Failed to converge for omega at i = 269
+## trouble in wsolve
+## Failed to converge for omega at i = 270
+## trouble in wsolve
+## Failed to converge for omega at i = 271
+## trouble in wsolve
+## Failed to converge for omega at i = 272
+## trouble in wsolve
+## Failed to converge for omega at i = 273
+## trouble in wsolve
+## Failed to converge for omega at i = 274
+## trouble in wsolve
+## Failed to converge for omega at i = 275
+## trouble in wsolve
+## Failed to converge for omega at i = 276
+## trouble in wsolve
+## Failed to converge for omega at i = 277
+## trouble in wsolve
+## Failed to converge for omega at i = 278
+## trouble in wsolve
+## Failed to converge for omega at i = 279
+## trouble in wsolve
+## Failed to converge for omega at i = 280
+## trouble in wsolve
+## Failed to converge for omega at i = 281
+## trouble in wsolve
+## Failed to converge for omega at i = 282
+## trouble in wsolve
+## Failed to converge for omega at i = 283
+## trouble in wsolve
+## Failed to converge for omega at i = 284
+## trouble in wsolve
+## Failed to converge for omega at i = 285
+## trouble in wsolve
+## Failed to converge for omega at i = 286
+## trouble in wsolve
+## Failed to converge for omega at i = 287
+## trouble in wsolve
+## Failed to converge for omega at i = 288
+## trouble in wsolve
+## Failed to converge for omega at i = 289
+## trouble in wsolve
+## Failed to converge for omega at i = 290
+## trouble in wsolve
+## Failed to converge for omega at i = 291
+## trouble in wsolve
+## Failed to converge for omega at i = 292
+## trouble in wsolve
+## Failed to converge for omega at i = 293
+## trouble in wsolve
+## Failed to converge for omega at i = 294
+## trouble in wsolve
+## Failed to converge for omega at i = 295
+## trouble in wsolve
+## Failed to converge for omega at i = 296
+## trouble in wsolve
+## Failed to converge for omega at i = 297
+## trouble in wsolve
+## Failed to converge for omega at i = 298
+## trouble in wsolve
+## Failed to converge for omega at i = 299
+## trouble in wsolve
+## Failed to converge for omega at i = 300
+## trouble in wsolve
+## Failed to converge for omega at i = 301
+## trouble in wsolve
+## Failed to converge for omega at i = 302
+## trouble in wsolve
+## Failed to converge for omega at i = 303
+## trouble in wsolve
+## Failed to converge for omega at i = 304
+## trouble in wsolve
+## Failed to converge for omega at i = 305
+## trouble in wsolve
+## Failed to converge for omega at i = 306
+## trouble in wsolve
+## Failed to converge for omega at i = 307
+## trouble in wsolve
+## Failed to converge for omega at i = 308
+## trouble in wsolve
+## Failed to converge for omega at i = 309
+## trouble in wsolve
+## Failed to converge for omega at i = 310
+## trouble in wsolve
+## Failed to converge for omega at i = 311
+## trouble in wsolve
+## Failed to converge for omega at i = 312
+## trouble in wsolve
+## Failed to converge for omega at i = 313
+## trouble in wsolve
+## Failed to converge for omega at i = 314
+## trouble in wsolve
+## Failed to converge for omega at i = 315
+## trouble in wsolve
+## Failed to converge for omega at i = 316
+## trouble in wsolve
+## Failed to converge for omega at i = 317
+## trouble in wsolve
+## Failed to converge for omega at i = 318
+## trouble in wsolve
+## Failed to converge for omega at i = 319
+## trouble in wsolve
+## Failed to converge for omega at i = 320
+## trouble in wsolve
+## Failed to converge for omega at i = 321
+## trouble in wsolve
+## Failed to converge for omega at i = 322
+## trouble in wsolve
+## Failed to converge for omega at i = 323
+## trouble in wsolve
+## Failed to converge for omega at i = 324
+## trouble in wsolve
+## Failed to converge for omega at i = 325
+## trouble in wsolve
+## Failed to converge for omega at i = 326
+## trouble in wsolve
+## Failed to converge for omega at i = 327
+## trouble in wsolve
+## Failed to converge for omega at i = 328
+## trouble in wsolve
+## Failed to converge for omega at i = 329
+## trouble in wsolve
+## Failed to converge for omega at i = 330
+## trouble in wsolve
+## Failed to converge for omega at i = 331
+## trouble in wsolve
+## Failed to converge for omega at i = 332
+## trouble in wsolve
+## Failed to converge for omega at i = 333
+## trouble in wsolve
+## Failed to converge for omega at i = 334
+## trouble in wsolve
+## Failed to converge for omega at i = 335
+## trouble in wsolve
+## Failed to converge for omega at i = 336
+## trouble in wsolve
+## Failed to converge for omega at i = 337
+## trouble in wsolve
+## Failed to converge for omega at i = 338
+## trouble in wsolve
+## Failed to converge for omega at i = 339
+## trouble in wsolve
+## Failed to converge for omega at i = 340
+## trouble in wsolve
+## Failed to converge for omega at i = 341
+## trouble in wsolve
+## Failed to converge for omega at i = 342
+## trouble in wsolve
+## Failed to converge for omega at i = 343
+## trouble in wsolve
+## Failed to converge for omega at i = 344
+## trouble in wsolve
+## Failed to converge for omega at i = 345
+## trouble in wsolve
+## Failed to converge for omega at i = 346
+## trouble in wsolve
+## Failed to converge for omega at i = 347
+## trouble in wsolve
+## Failed to converge for omega at i = 348
+## trouble in wsolve
+## Failed to converge for omega at i = 349
+## trouble in wsolve
+## Failed to converge for omega at i = 350
+## trouble in wsolve
+## Failed to converge for omega at i = 351
+## trouble in wsolve
+## Failed to converge for omega at i = 352
+## trouble in wsolve
+## Failed to converge for omega at i = 353
+## trouble in wsolve
+## Failed to converge for omega at i = 354
+## trouble in wsolve
+## Failed to converge for omega at i = 355
+## trouble in wsolve
+## Failed to converge for omega at i = 356
+## trouble in wsolve
+## Failed to converge for omega at i = 357
+## trouble in wsolve
+## Failed to converge for omega at i = 358
+## trouble in wsolve
+## Failed to converge for omega at i = 359
+## trouble in wsolve
+## Failed to converge for omega at i = 360
+## trouble in wsolve
+## Failed to converge for omega at i = 361
+## trouble in wsolve
+## Failed to converge for omega at i = 362
+## trouble in wsolve
+## Failed to converge for omega at i = 363
+## trouble in wsolve
+## Failed to converge for omega at i = 364
+## trouble in wsolve
+## Failed to converge for omega at i = 365
+## trouble in wsolve
+## Failed to converge for omega at i = 366
+## trouble in wsolve
+## Failed to converge for omega at i = 367
+## trouble in wsolve
+## Failed to converge for omega at i = 368
+## trouble in wsolve
+## Failed to converge for omega at i = 369
+## trouble in wsolve
+## Failed to converge for omega at i = 370
+## trouble in wsolve
+## Failed to converge for omega at i = 371
+## trouble in wsolve
+## Failed to converge for omega at i = 372
+## trouble in wsolve
+## Failed to converge for omega at i = 373
+## trouble in wsolve
+## Failed to converge for omega at i = 374
+## trouble in wsolve
+## Failed to converge for omega at i = 375
+## trouble in wsolve
+## Failed to converge for omega at i = 376
+## trouble in wsolve
+## Failed to converge for omega at i = 377
+## trouble in wsolve
+## Failed to converge for omega at i = 378
+## trouble in wsolve
+## Failed to converge for omega at i = 379
+## trouble in wsolve
+## Failed to converge for omega at i = 380
+## trouble in wsolve
+## Failed to converge for omega at i = 381
+## trouble in wsolve
+## Failed to converge for omega at i = 382
+## trouble in wsolve
+## Failed to converge for omega at i = 383
+## trouble in wsolve
+## Failed to converge for omega at i = 384
+## trouble in wsolve
+## Failed to converge for omega at i = 385
+## trouble in wsolve
+## Failed to converge for omega at i = 386
+## trouble in wsolve
+## Failed to converge for omega at i = 387
+## trouble in wsolve
+## Failed to converge for omega at i = 388
+## trouble in wsolve
+## Failed to converge for omega at i = 389
+## trouble in wsolve
+## Failed to converge for omega at i = 390
+## trouble in wsolve
+## Failed to converge for omega at i = 391
+## trouble in wsolve
+## Failed to converge for omega at i = 392
+## trouble in wsolve
+## Failed to converge for omega at i = 393
+## trouble in wsolve
+## Failed to converge for omega at i = 394
+## trouble in wsolve
+## Failed to converge for omega at i = 395
+## trouble in wsolve
+## Failed to converge for omega at i = 396
+## trouble in wsolve
+## Failed to converge for omega at i = 397
+## trouble in wsolve
+## Failed to converge for omega at i = 398
+## trouble in wsolve
+## Failed to converge for omega at i = 399
+## trouble in wsolve
+## Failed to converge for omega at i = 400
+## trouble in wsolve
+## Failed to converge for omega at i = 401
+## trouble in wsolve
+## Failed to converge for omega at i = 402
+## trouble in wsolve
+## Failed to converge for omega at i = 403
+## trouble in wsolve
+## Failed to converge for omega at i = 404
+## trouble in wsolve
+## Failed to converge for omega at i = 405
+## trouble in wsolve
+## Failed to converge for omega at i = 406
+## trouble in wsolve
+## Failed to converge for omega at i = 407
+## trouble in wsolve
+## Failed to converge for omega at i = 408
+## trouble in wsolve
+## Failed to converge for omega at i = 409
+## trouble in wsolve
+## Failed to converge for omega at i = 410
+## trouble in wsolve
+## Failed to converge for omega at i = 411
+## trouble in wsolve
+## Failed to converge for omega at i = 412
+## trouble in wsolve
+## Failed to converge for omega at i = 413
+## trouble in wsolve
+## Failed to converge for omega at i = 414
+## trouble in wsolve
+## Failed to converge for omega at i = 415
+## trouble in wsolve
+## Failed to converge for omega at i = 416
+## trouble in wsolve
+## Failed to converge for omega at i = 417
+## trouble in wsolve
+## Failed to converge for omega at i = 418
+## trouble in wsolve
+## Failed to converge for omega at i = 419
+## trouble in wsolve
+## Failed to converge for omega at i = 420
+## trouble in wsolve
+## Failed to converge for omega at i = 421
+## trouble in wsolve
+## Failed to converge for omega at i = 422
+## trouble in wsolve
+## Failed to converge for omega at i = 423
+## trouble in wsolve
+## Failed to converge for omega at i = 424
+## trouble in wsolve
+## Failed to converge for omega at i = 425
+## trouble in wsolve
+## Failed to converge for omega at i = 426
+## trouble in wsolve
+## Failed to converge for omega at i = 427
+## trouble in wsolve
+## Failed to converge for omega at i = 428
+## trouble in wsolve
+## Failed to converge for omega at i = 429
+## trouble in wsolve
+## Failed to converge for omega at i = 430
+## trouble in wsolve
+## Failed to converge for omega at i = 431
+## trouble in wsolve
+## Failed to converge for omega at i = 432
+## trouble in wsolve
+## Failed to converge for omega at i = 433
+## trouble in wsolve
+## Failed to converge for omega at i = 434
+## trouble in wsolve
+## Failed to converge for omega at i = 435
+## trouble in wsolve
+## Failed to converge for omega at i = 436
+## trouble in wsolve
+## Failed to converge for omega at i = 437
+## trouble in wsolve
+## Failed to converge for omega at i = 438
+## trouble in wsolve
+## Failed to converge for omega at i = 439
+## trouble in wsolve
+## Failed to converge for omega at i = 440
+## trouble in wsolve
+## Failed to converge for omega at i = 441
+## trouble in wsolve
+## Failed to converge for omega at i = 442
+## trouble in wsolve
+## Failed to converge for omega at i = 443
+## trouble in wsolve
+## Failed to converge for omega at i = 444
+## trouble in wsolve
+## Failed to converge for omega at i = 445
+## trouble in wsolve
+## Failed to converge for omega at i = 446
+## trouble in wsolve
+## Failed to converge for omega at i = 447
+## trouble in wsolve
+## Failed to converge for omega at i = 448
+## trouble in wsolve
+## Failed to converge for omega at i = 449
+## trouble in wsolve
+## Failed to converge for omega at i = 450
+## trouble in wsolve
+## Failed to converge for omega at i = 451
+## trouble in wsolve
+## Failed to converge for omega at i = 452
+## trouble in wsolve
+## Failed to converge for omega at i = 453
+## trouble in wsolve
+## Failed to converge for omega at i = 454
+## trouble in wsolve
+## Failed to converge for omega at i = 455
+## trouble in wsolve
+## Failed to converge for omega at i = 456
+## trouble in wsolve
+## Failed to converge for omega at i = 457
+## trouble in wsolve
+## Failed to converge for omega at i = 458
+## trouble in wsolve
+## Failed to converge for omega at i = 459
+## trouble in wsolve
+## Failed to converge for omega at i = 460
+## trouble in wsolve
+## Failed to converge for omega at i = 461
+## trouble in wsolve
+## Failed to converge for omega at i = 462
+## trouble in wsolve
+## Failed to converge for omega at i = 463
+## trouble in wsolve
+## Failed to converge for omega at i = 464
+## trouble in wsolve
+## Failed to converge for omega at i = 465
+## trouble in wsolve
+## Failed to converge for omega at i = 466
+## trouble in wsolve
+## Failed to converge for omega at i = 467
+## trouble in wsolve
+## Failed to converge for omega at i = 468
+## trouble in wsolve
+## Failed to converge for omega at i = 469
+## trouble in wsolve
+## Failed to converge for omega at i = 470
+## trouble in wsolve
+## Failed to converge for omega at i = 471
+## trouble in wsolve
+## Failed to converge for omega at i = 472
+## trouble in wsolve
+## Failed to converge for omega at i = 473
+## trouble in wsolve
+## Failed to converge for omega at i = 474
+## trouble in wsolve
+## Failed to converge for omega at i = 475
+## trouble in wsolve
+## Failed to converge for omega at i = 476
+## trouble in wsolve
+## Failed to converge for omega at i = 477
+## trouble in wsolve
+## Failed to converge for omega at i = 478
+## trouble in wsolve
+## Failed to converge for omega at i = 479
+## trouble in wsolve
+## Failed to converge for omega at i = 480
+## trouble in wsolve
+## Failed to converge for omega at i = 481
+## trouble in wsolve
+## Failed to converge for omega at i = 482
+## trouble in wsolve
+## Failed to converge for omega at i = 483
+## trouble in wsolve
+## Failed to converge for omega at i = 484
+## trouble in wsolve
+## Failed to converge for omega at i = 485
+## trouble in wsolve
+## Failed to converge for omega at i = 486
+## trouble in wsolve
+## Failed to converge for omega at i = 487
+## trouble in wsolve
+## Failed to converge for omega at i = 488
+## trouble in wsolve
+## Failed to converge for omega at i = 489
+## trouble in wsolve
+## Failed to converge for omega at i = 490
+## trouble in wsolve
+## Failed to converge for omega at i = 491
+## trouble in wsolve
+## Failed to converge for omega at i = 492
+## trouble in wsolve
+## Failed to converge for omega at i = 493
+## trouble in wsolve
+## Failed to converge for omega at i = 494
+## trouble in wsolve
+## Failed to converge for omega at i = 495
+## trouble in wsolve
+## Failed to converge for omega at i = 496
+## trouble in wsolve
+## Failed to converge for omega at i = 497
+## trouble in wsolve
+## Failed to converge for omega at i = 498
+## trouble in wsolve
+## Failed to converge for omega at i = 499
+## trouble in wsolve
+## Failed to converge for omega at i = 500
+## log posterior increase: trouble in wsolve
+## Failed to converge for omega at i = 1
+## trouble in wsolve
+## Failed to converge for omega at i = 2
+## trouble in wsolve
+## Failed to converge for omega at i = 3
+## trouble in wsolve
+## Failed to converge for omega at i = 4
+## trouble in wsolve
+## Failed to converge for omega at i = 5
+## trouble in wsolve
+## Failed to converge for omega at i = 6
+## trouble in wsolve
+## Failed to converge for omega at i = 7
+## trouble in wsolve
+## Failed to converge for omega at i = 8
+## trouble in wsolve
+## Failed to converge for omega at i = 9
+## trouble in wsolve
+## Failed to converge for omega at i = 10
+## trouble in wsolve
+## Failed to converge for omega at i = 11
+## trouble in wsolve
+## Failed to converge for omega at i = 12
+## trouble in wsolve
+## Failed to converge for omega at i = 13
+## trouble in wsolve
+## Failed to converge for omega at i = 14
+## trouble in wsolve
+## Failed to converge for omega at i = 15
+## trouble in wsolve
+## Failed to converge for omega at i = 16
+## trouble in wsolve
+## Failed to converge for omega at i = 17
+## trouble in wsolve
+## Failed to converge for omega at i = 18
+## trouble in wsolve
+## Failed to converge for omega at i = 19
+## trouble in wsolve
+## Failed to converge for omega at i = 20
+## trouble in wsolve
+## Failed to converge for omega at i = 21
+## trouble in wsolve
+## Failed to converge for omega at i = 22
+## trouble in wsolve
+## Failed to converge for omega at i = 23
+## trouble in wsolve
+## Failed to converge for omega at i = 24
+## trouble in wsolve
+## Failed to converge for omega at i = 25
+## trouble in wsolve
+## Failed to converge for omega at i = 26
+## trouble in wsolve
+## Failed to converge for omega at i = 27
+## trouble in wsolve
+## Failed to converge for omega at i = 28
+## trouble in wsolve
+## Failed to converge for omega at i = 29
+## trouble in wsolve
+## Failed to converge for omega at i = 30
+## trouble in wsolve
+## Failed to converge for omega at i = 31
+## trouble in wsolve
+## Failed to converge for omega at i = 32
+## trouble in wsolve
+## Failed to converge for omega at i = 33
+## trouble in wsolve
+## Failed to converge for omega at i = 34
+## trouble in wsolve
+## Failed to converge for omega at i = 35
+## trouble in wsolve
+## Failed to converge for omega at i = 36
+## trouble in wsolve
+## Failed to converge for omega at i = 37
+## trouble in wsolve
+## Failed to converge for omega at i = 38
+## trouble in wsolve
+## Failed to converge for omega at i = 39
+## trouble in wsolve
+## Failed to converge for omega at i = 40
+## trouble in wsolve
+## Failed to converge for omega at i = 41
+## trouble in wsolve
+## Failed to converge for omega at i = 42
+## trouble in wsolve
+## Failed to converge for omega at i = 43
+## trouble in wsolve
+## Failed to converge for omega at i = 44
+## trouble in wsolve
+## Failed to converge for omega at i = 45
+## trouble in wsolve
+## Failed to converge for omega at i = 46
+## trouble in wsolve
+## Failed to converge for omega at i = 47
+## trouble in wsolve
+## Failed to converge for omega at i = 48
+## trouble in wsolve
+## Failed to converge for omega at i = 49
+## trouble in wsolve
+## Failed to converge for omega at i = 50
+## trouble in wsolve
+## Failed to converge for omega at i = 51
+## trouble in wsolve
+## Failed to converge for omega at i = 52
+## trouble in wsolve
+## Failed to converge for omega at i = 53
+## trouble in wsolve
+## Failed to converge for omega at i = 54
+## trouble in wsolve
+## Failed to converge for omega at i = 55
+## trouble in wsolve
+## Failed to converge for omega at i = 56
+## trouble in wsolve
+## Failed to converge for omega at i = 57
+## trouble in wsolve
+## Failed to converge for omega at i = 58
+## trouble in wsolve
+## Failed to converge for omega at i = 59
+## trouble in wsolve
+## Failed to converge for omega at i = 60
+## trouble in wsolve
+## Failed to converge for omega at i = 61
+## trouble in wsolve
+## Failed to converge for omega at i = 62
+## trouble in wsolve
+## Failed to converge for omega at i = 63
+## trouble in wsolve
+## Failed to converge for omega at i = 64
+## trouble in wsolve
+## Failed to converge for omega at i = 65
+## trouble in wsolve
+## Failed to converge for omega at i = 66
+## trouble in wsolve
+## Failed to converge for omega at i = 67
+## trouble in wsolve
+## Failed to converge for omega at i = 68
+## trouble in wsolve
+## Failed to converge for omega at i = 69
+## trouble in wsolve
+## Failed to converge for omega at i = 70
+## trouble in wsolve
+## Failed to converge for omega at i = 71
+## trouble in wsolve
+## Failed to converge for omega at i = 72
+## trouble in wsolve
+## Failed to converge for omega at i = 73
+## trouble in wsolve
+## Failed to converge for omega at i = 74
+## trouble in wsolve
+## Failed to converge for omega at i = 75
+## trouble in wsolve
+## Failed to converge for omega at i = 76
+## trouble in wsolve
+## Failed to converge for omega at i = 77
+## trouble in wsolve
+## Failed to converge for omega at i = 78
+## trouble in wsolve
+## Failed to converge for omega at i = 79
+## trouble in wsolve
+## Failed to converge for omega at i = 80
+## trouble in wsolve
+## Failed to converge for omega at i = 81
+## trouble in wsolve
+## Failed to converge for omega at i = 82
+## trouble in wsolve
+## Failed to converge for omega at i = 83
+## trouble in wsolve
+## Failed to converge for omega at i = 84
+## trouble in wsolve
+## Failed to converge for omega at i = 85
+## trouble in wsolve
+## Failed to converge for omega at i = 86
+## trouble in wsolve
+## Failed to converge for omega at i = 87
+## trouble in wsolve
+## Failed to converge for omega at i = 88
+## trouble in wsolve
+## Failed to converge for omega at i = 89
+## trouble in wsolve
+## Failed to converge for omega at i = 90
+## trouble in wsolve
+## Failed to converge for omega at i = 91
+## trouble in wsolve
+## Failed to converge for omega at i = 92
+## trouble in wsolve
+## Failed to converge for omega at i = 93
+## trouble in wsolve
+## Failed to converge for omega at i = 94
+## trouble in wsolve
+## Failed to converge for omega at i = 95
+## trouble in wsolve
+## Failed to converge for omega at i = 96
+## trouble in wsolve
+## Failed to converge for omega at i = 97
+## trouble in wsolve
+## Failed to converge for omega at i = 98
+## trouble in wsolve
+## Failed to converge for omega at i = 99
+## trouble in wsolve
+## Failed to converge for omega at i = 100
+## trouble in wsolve
+## Failed to converge for omega at i = 101
+## trouble in wsolve
+## Failed to converge for omega at i = 102
+## trouble in wsolve
+## Failed to converge for omega at i = 103
+## trouble in wsolve
+## Failed to converge for omega at i = 104
+## trouble in wsolve
+## Failed to converge for omega at i = 105
+## trouble in wsolve
+## Failed to converge for omega at i = 106
+## trouble in wsolve
+## Failed to converge for omega at i = 107
+## trouble in wsolve
+## Failed to converge for omega at i = 108
+## trouble in wsolve
+## Failed to converge for omega at i = 109
+## trouble in wsolve
+## Failed to converge for omega at i = 110
+## trouble in wsolve
+## Failed to converge for omega at i = 111
+## trouble in wsolve
+## Failed to converge for omega at i = 112
+## trouble in wsolve
+## Failed to converge for omega at i = 113
+## trouble in wsolve
+## Failed to converge for omega at i = 114
+## trouble in wsolve
+## Failed to converge for omega at i = 115
+## trouble in wsolve
+## Failed to converge for omega at i = 116
+## trouble in wsolve
+## Failed to converge for omega at i = 117
+## trouble in wsolve
+## Failed to converge for omega at i = 118
+## trouble in wsolve
+## Failed to converge for omega at i = 119
+## trouble in wsolve
+## Failed to converge for omega at i = 120
+## trouble in wsolve
+## Failed to converge for omega at i = 121
+## trouble in wsolve
+## Failed to converge for omega at i = 122
+## trouble in wsolve
+## Failed to converge for omega at i = 123
+## trouble in wsolve
+## Failed to converge for omega at i = 124
+## trouble in wsolve
+## Failed to converge for omega at i = 125
+## trouble in wsolve
+## Failed to converge for omega at i = 126
+## trouble in wsolve
+## Failed to converge for omega at i = 127
+## trouble in wsolve
+## Failed to converge for omega at i = 128
+## trouble in wsolve
+## Failed to converge for omega at i = 129
+## trouble in wsolve
+## Failed to converge for omega at i = 130
+## trouble in wsolve
+## Failed to converge for omega at i = 131
+## trouble in wsolve
+## Failed to converge for omega at i = 132
+## trouble in wsolve
+## Failed to converge for omega at i = 133
+## trouble in wsolve
+## Failed to converge for omega at i = 134
+## trouble in wsolve
+## Failed to converge for omega at i = 135
+## trouble in wsolve
+## Failed to converge for omega at i = 136
+## trouble in wsolve
+## Failed to converge for omega at i = 137
+## trouble in wsolve
+## Failed to converge for omega at i = 138
+## trouble in wsolve
+## Failed to converge for omega at i = 139
+## trouble in wsolve
+## Failed to converge for omega at i = 140
+## trouble in wsolve
+## Failed to converge for omega at i = 141
+## trouble in wsolve
+## Failed to converge for omega at i = 142
+## trouble in wsolve
+## Failed to converge for omega at i = 143
+## trouble in wsolve
+## Failed to converge for omega at i = 144
+## trouble in wsolve
+## Failed to converge for omega at i = 145
+## trouble in wsolve
+## Failed to converge for omega at i = 146
+## trouble in wsolve
+## Failed to converge for omega at i = 147
+## trouble in wsolve
+## Failed to converge for omega at i = 148
+## trouble in wsolve
+## Failed to converge for omega at i = 149
+## trouble in wsolve
+## Failed to converge for omega at i = 150
+## trouble in wsolve
+## Failed to converge for omega at i = 151
+## trouble in wsolve
+## Failed to converge for omega at i = 152
+## trouble in wsolve
+## Failed to converge for omega at i = 153
+## trouble in wsolve
+## Failed to converge for omega at i = 154
+## trouble in wsolve
+## Failed to converge for omega at i = 155
+## trouble in wsolve
+## Failed to converge for omega at i = 156
+## trouble in wsolve
+## Failed to converge for omega at i = 157
+## trouble in wsolve
+## Failed to converge for omega at i = 158
+## trouble in wsolve
+## Failed to converge for omega at i = 159
+## trouble in wsolve
+## Failed to converge for omega at i = 160
+## trouble in wsolve
+## Failed to converge for omega at i = 161
+## trouble in wsolve
+## Failed to converge for omega at i = 162
+## trouble in wsolve
+## Failed to converge for omega at i = 163
+## trouble in wsolve
+## Failed to converge for omega at i = 164
+## trouble in wsolve
+## Failed to converge for omega at i = 165
+## trouble in wsolve
+## Failed to converge for omega at i = 166
+## trouble in wsolve
+## Failed to converge for omega at i = 167
+## trouble in wsolve
+## Failed to converge for omega at i = 168
+## trouble in wsolve
+## Failed to converge for omega at i = 169
+## trouble in wsolve
+## Failed to converge for omega at i = 170
+## trouble in wsolve
+## Failed to converge for omega at i = 171
+## trouble in wsolve
+## Failed to converge for omega at i = 172
+## trouble in wsolve
+## Failed to converge for omega at i = 173
+## trouble in wsolve
+## Failed to converge for omega at i = 174
+## trouble in wsolve
+## Failed to converge for omega at i = 175
+## trouble in wsolve
+## Failed to converge for omega at i = 176
+## trouble in wsolve
+## Failed to converge for omega at i = 177
+## trouble in wsolve
+## Failed to converge for omega at i = 178
+## trouble in wsolve
+## Failed to converge for omega at i = 179
+## trouble in wsolve
+## Failed to converge for omega at i = 180
+## trouble in wsolve
+## Failed to converge for omega at i = 181
+## trouble in wsolve
+## Failed to converge for omega at i = 182
+## trouble in wsolve
+## Failed to converge for omega at i = 183
+## trouble in wsolve
+## Failed to converge for omega at i = 184
+## trouble in wsolve
+## Failed to converge for omega at i = 185
+## trouble in wsolve
+## Failed to converge for omega at i = 186
+## trouble in wsolve
+## Failed to converge for omega at i = 187
+## trouble in wsolve
+## Failed to converge for omega at i = 188
+## trouble in wsolve
+## Failed to converge for omega at i = 189
+## trouble in wsolve
+## Failed to converge for omega at i = 190
+## trouble in wsolve
+## Failed to converge for omega at i = 191
+## trouble in wsolve
+## Failed to converge for omega at i = 192
+## trouble in wsolve
+## Failed to converge for omega at i = 193
+## trouble in wsolve
+## Failed to converge for omega at i = 194
+## trouble in wsolve
+## Failed to converge for omega at i = 195
+## trouble in wsolve
+## Failed to converge for omega at i = 196
+## trouble in wsolve
+## Failed to converge for omega at i = 197
+## trouble in wsolve
+## Failed to converge for omega at i = 198
+## trouble in wsolve
+## Failed to converge for omega at i = 199
+## trouble in wsolve
+## Failed to converge for omega at i = 200
+## trouble in wsolve
+## Failed to converge for omega at i = 201
+## trouble in wsolve
+## Failed to converge for omega at i = 202
+## trouble in wsolve
+## Failed to converge for omega at i = 203
+## trouble in wsolve
+## Failed to converge for omega at i = 204
+## trouble in wsolve
+## Failed to converge for omega at i = 205
+## trouble in wsolve
+## Failed to converge for omega at i = 206
+## trouble in wsolve
+## Failed to converge for omega at i = 207
+## trouble in wsolve
+## Failed to converge for omega at i = 208
+## trouble in wsolve
+## Failed to converge for omega at i = 209
+## trouble in wsolve
+## Failed to converge for omega at i = 210
+## trouble in wsolve
+## Failed to converge for omega at i = 211
+## trouble in wsolve
+## Failed to converge for omega at i = 212
+## trouble in wsolve
+## Failed to converge for omega at i = 213
+## trouble in wsolve
+## Failed to converge for omega at i = 214
+## trouble in wsolve
+## Failed to converge for omega at i = 215
+## trouble in wsolve
+## Failed to converge for omega at i = 216
+## trouble in wsolve
+## Failed to converge for omega at i = 217
+## trouble in wsolve
+## Failed to converge for omega at i = 218
+## trouble in wsolve
+## Failed to converge for omega at i = 219
+## trouble in wsolve
+## Failed to converge for omega at i = 220
+## trouble in wsolve
+## Failed to converge for omega at i = 221
+## trouble in wsolve
+## Failed to converge for omega at i = 222
+## trouble in wsolve
+## Failed to converge for omega at i = 223
+## trouble in wsolve
+## Failed to converge for omega at i = 224
+## trouble in wsolve
+## Failed to converge for omega at i = 225
+## trouble in wsolve
+## Failed to converge for omega at i = 226
+## trouble in wsolve
+## Failed to converge for omega at i = 227
+## trouble in wsolve
+## Failed to converge for omega at i = 228
+## trouble in wsolve
+## Failed to converge for omega at i = 229
+## trouble in wsolve
+## Failed to converge for omega at i = 230
+## trouble in wsolve
+## Failed to converge for omega at i = 231
+## trouble in wsolve
+## Failed to converge for omega at i = 232
+## trouble in wsolve
+## Failed to converge for omega at i = 233
+## trouble in wsolve
+## Failed to converge for omega at i = 234
+## trouble in wsolve
+## Failed to converge for omega at i = 235
+## trouble in wsolve
+## Failed to converge for omega at i = 236
+## trouble in wsolve
+## Failed to converge for omega at i = 237
+## trouble in wsolve
+## Failed to converge for omega at i = 238
+## trouble in wsolve
+## Failed to converge for omega at i = 239
+## trouble in wsolve
+## Failed to converge for omega at i = 240
+## trouble in wsolve
+## Failed to converge for omega at i = 241
+## trouble in wsolve
+## Failed to converge for omega at i = 242
+## trouble in wsolve
+## Failed to converge for omega at i = 243
+## trouble in wsolve
+## Failed to converge for omega at i = 244
+## trouble in wsolve
+## Failed to converge for omega at i = 245
+## trouble in wsolve
+## Failed to converge for omega at i = 246
+## trouble in wsolve
+## Failed to converge for omega at i = 247
+## trouble in wsolve
+## Failed to converge for omega at i = 248
+## trouble in wsolve
+## Failed to converge for omega at i = 249
+## trouble in wsolve
+## Failed to converge for omega at i = 250
+## trouble in wsolve
+## Failed to converge for omega at i = 251
+## trouble in wsolve
+## Failed to converge for omega at i = 252
+## trouble in wsolve
+## Failed to converge for omega at i = 253
+## trouble in wsolve
+## Failed to converge for omega at i = 254
+## trouble in wsolve
+## Failed to converge for omega at i = 255
+## trouble in wsolve
+## Failed to converge for omega at i = 256
+## trouble in wsolve
+## Failed to converge for omega at i = 257
+## trouble in wsolve
+## Failed to converge for omega at i = 258
+## trouble in wsolve
+## Failed to converge for omega at i = 259
+## trouble in wsolve
+## Failed to converge for omega at i = 260
+## trouble in wsolve
+## Failed to converge for omega at i = 261
+## trouble in wsolve
+## Failed to converge for omega at i = 262
+## trouble in wsolve
+## Failed to converge for omega at i = 263
+## trouble in wsolve
+## Failed to converge for omega at i = 264
+## trouble in wsolve
+## Failed to converge for omega at i = 265
+## trouble in wsolve
+## Failed to converge for omega at i = 266
+## trouble in wsolve
+## Failed to converge for omega at i = 267
+## trouble in wsolve
+## Failed to converge for omega at i = 268
+## trouble in wsolve
+## Failed to converge for omega at i = 269
+## trouble in wsolve
+## Failed to converge for omega at i = 270
+## trouble in wsolve
+## Failed to converge for omega at i = 271
+## trouble in wsolve
+## Failed to converge for omega at i = 272
+## trouble in wsolve
+## Failed to converge for omega at i = 273
+## trouble in wsolve
+## Failed to converge for omega at i = 274
+## trouble in wsolve
+## Failed to converge for omega at i = 275
+## trouble in wsolve
+## Failed to converge for omega at i = 276
+## trouble in wsolve
+## Failed to converge for omega at i = 277
+## trouble in wsolve
+## Failed to converge for omega at i = 278
+## trouble in wsolve
+## Failed to converge for omega at i = 279
+## trouble in wsolve
+## Failed to converge for omega at i = 280
+## trouble in wsolve
+## Failed to converge for omega at i = 281
+## trouble in wsolve
+## Failed to converge for omega at i = 282
+## trouble in wsolve
+## Failed to converge for omega at i = 283
+## trouble in wsolve
+## Failed to converge for omega at i = 284
+## trouble in wsolve
+## Failed to converge for omega at i = 285
+## trouble in wsolve
+## Failed to converge for omega at i = 286
+## trouble in wsolve
+## Failed to converge for omega at i = 287
+## trouble in wsolve
+## Failed to converge for omega at i = 288
+## trouble in wsolve
+## Failed to converge for omega at i = 289
+## trouble in wsolve
+## Failed to converge for omega at i = 290
+## trouble in wsolve
+## Failed to converge for omega at i = 291
+## trouble in wsolve
+## Failed to converge for omega at i = 292
+## trouble in wsolve
+## Failed to converge for omega at i = 293
+## trouble in wsolve
+## Failed to converge for omega at i = 294
+## trouble in wsolve
+## Failed to converge for omega at i = 295
+## trouble in wsolve
+## Failed to converge for omega at i = 296
+## trouble in wsolve
+## Failed to converge for omega at i = 297
+## trouble in wsolve
+## Failed to converge for omega at i = 298
+## trouble in wsolve
+## Failed to converge for omega at i = 299
+## trouble in wsolve
+## Failed to converge for omega at i = 300
+## trouble in wsolve
+## Failed to converge for omega at i = 301
+## trouble in wsolve
+## Failed to converge for omega at i = 302
+## trouble in wsolve
+## Failed to converge for omega at i = 303
+## trouble in wsolve
+## Failed to converge for omega at i = 304
+## trouble in wsolve
+## Failed to converge for omega at i = 305
+## trouble in wsolve
+## Failed to converge for omega at i = 306
+## trouble in wsolve
+## Failed to converge for omega at i = 307
+## trouble in wsolve
+## Failed to converge for omega at i = 308
+## trouble in wsolve
+## Failed to converge for omega at i = 309
+## trouble in wsolve
+## Failed to converge for omega at i = 310
+## trouble in wsolve
+## Failed to converge for omega at i = 311
+## trouble in wsolve
+## Failed to converge for omega at i = 312
+## trouble in wsolve
+## Failed to converge for omega at i = 313
+## trouble in wsolve
+## Failed to converge for omega at i = 314
+## trouble in wsolve
+## Failed to converge for omega at i = 315
+## trouble in wsolve
+## Failed to converge for omega at i = 316
+## trouble in wsolve
+## Failed to converge for omega at i = 317
+## trouble in wsolve
+## Failed to converge for omega at i = 318
+## trouble in wsolve
+## Failed to converge for omega at i = 319
+## trouble in wsolve
+## Failed to converge for omega at i = 320
+## trouble in wsolve
+## Failed to converge for omega at i = 321
+## trouble in wsolve
+## Failed to converge for omega at i = 322
+## trouble in wsolve
+## Failed to converge for omega at i = 323
+## trouble in wsolve
+## Failed to converge for omega at i = 324
+## trouble in wsolve
+## Failed to converge for omega at i = 325
+## trouble in wsolve
+## Failed to converge for omega at i = 326
+## trouble in wsolve
+## Failed to converge for omega at i = 327
+## trouble in wsolve
+## Failed to converge for omega at i = 328
+## trouble in wsolve
+## Failed to converge for omega at i = 329
+## trouble in wsolve
+## Failed to converge for omega at i = 330
+## trouble in wsolve
+## Failed to converge for omega at i = 331
+## trouble in wsolve
+## Failed to converge for omega at i = 332
+## trouble in wsolve
+## Failed to converge for omega at i = 333
+## trouble in wsolve
+## Failed to converge for omega at i = 334
+## trouble in wsolve
+## Failed to converge for omega at i = 335
+## trouble in wsolve
+## Failed to converge for omega at i = 336
+## trouble in wsolve
+## Failed to converge for omega at i = 337
+## trouble in wsolve
+## Failed to converge for omega at i = 338
+## trouble in wsolve
+## Failed to converge for omega at i = 339
+## trouble in wsolve
+## Failed to converge for omega at i = 340
+## trouble in wsolve
+## Failed to converge for omega at i = 341
+## trouble in wsolve
+## Failed to converge for omega at i = 342
+## trouble in wsolve
+## Failed to converge for omega at i = 343
+## trouble in wsolve
+## Failed to converge for omega at i = 344
+## trouble in wsolve
+## Failed to converge for omega at i = 345
+## trouble in wsolve
+## Failed to converge for omega at i = 346
+## trouble in wsolve
+## Failed to converge for omega at i = 347
+## trouble in wsolve
+## Failed to converge for omega at i = 348
+## trouble in wsolve
+## Failed to converge for omega at i = 349
+## trouble in wsolve
+## Failed to converge for omega at i = 350
+## trouble in wsolve
+## Failed to converge for omega at i = 351
+## trouble in wsolve
+## Failed to converge for omega at i = 352
+## trouble in wsolve
+## Failed to converge for omega at i = 353
+## trouble in wsolve
+## Failed to converge for omega at i = 354
+## trouble in wsolve
+## Failed to converge for omega at i = 355
+## trouble in wsolve
+## Failed to converge for omega at i = 356
+## trouble in wsolve
+## Failed to converge for omega at i = 357
+## trouble in wsolve
+## Failed to converge for omega at i = 358
+## trouble in wsolve
+## Failed to converge for omega at i = 359
+## trouble in wsolve
+## Failed to converge for omega at i = 360
+## trouble in wsolve
+## Failed to converge for omega at i = 361
+## trouble in wsolve
+## Failed to converge for omega at i = 362
+## trouble in wsolve
+## Failed to converge for omega at i = 363
+## trouble in wsolve
+## Failed to converge for omega at i = 364
+## trouble in wsolve
+## Failed to converge for omega at i = 365
+## trouble in wsolve
+## Failed to converge for omega at i = 366
+## trouble in wsolve
+## Failed to converge for omega at i = 367
+## trouble in wsolve
+## Failed to converge for omega at i = 368
+## trouble in wsolve
+## Failed to converge for omega at i = 369
+## trouble in wsolve
+## Failed to converge for omega at i = 370
+## trouble in wsolve
+## Failed to converge for omega at i = 371
+## trouble in wsolve
+## Failed to converge for omega at i = 372
+## trouble in wsolve
+## Failed to converge for omega at i = 373
+## trouble in wsolve
+## Failed to converge for omega at i = 374
+## trouble in wsolve
+## Failed to converge for omega at i = 375
+## trouble in wsolve
+## Failed to converge for omega at i = 376
+## trouble in wsolve
+## Failed to converge for omega at i = 377
+## trouble in wsolve
+## Failed to converge for omega at i = 378
+## trouble in wsolve
+## Failed to converge for omega at i = 379
+## trouble in wsolve
+## Failed to converge for omega at i = 380
+## trouble in wsolve
+## Failed to converge for omega at i = 381
+## trouble in wsolve
+## Failed to converge for omega at i = 382
+## trouble in wsolve
+## Failed to converge for omega at i = 383
+## trouble in wsolve
+## Failed to converge for omega at i = 384
+## trouble in wsolve
+## Failed to converge for omega at i = 385
+## trouble in wsolve
+## Failed to converge for omega at i = 386
+## trouble in wsolve
+## Failed to converge for omega at i = 387
+## trouble in wsolve
+## Failed to converge for omega at i = 388
+## trouble in wsolve
+## Failed to converge for omega at i = 389
+## trouble in wsolve
+## Failed to converge for omega at i = 390
+## trouble in wsolve
+## Failed to converge for omega at i = 391
+## trouble in wsolve
+## Failed to converge for omega at i = 392
+## trouble in wsolve
+## Failed to converge for omega at i = 393
+## trouble in wsolve
+## Failed to converge for omega at i = 394
+## trouble in wsolve
+## Failed to converge for omega at i = 395
+## trouble in wsolve
+## Failed to converge for omega at i = 396
+## trouble in wsolve
+## Failed to converge for omega at i = 397
+## trouble in wsolve
+## Failed to converge for omega at i = 398
+## trouble in wsolve
+## Failed to converge for omega at i = 399
+## trouble in wsolve
+## Failed to converge for omega at i = 400
+## trouble in wsolve
+## Failed to converge for omega at i = 401
+## trouble in wsolve
+## Failed to converge for omega at i = 402
+## trouble in wsolve
+## Failed to converge for omega at i = 403
+## trouble in wsolve
+## Failed to converge for omega at i = 404
+## trouble in wsolve
+## Failed to converge for omega at i = 405
+## trouble in wsolve
+## Failed to converge for omega at i = 406
+## trouble in wsolve
+## Failed to converge for omega at i = 407
+## trouble in wsolve
+## Failed to converge for omega at i = 408
+## trouble in wsolve
+## Failed to converge for omega at i = 409
+## trouble in wsolve
+## Failed to converge for omega at i = 410
+## trouble in wsolve
+## Failed to converge for omega at i = 411
+## trouble in wsolve
+## Failed to converge for omega at i = 412
+## trouble in wsolve
+## Failed to converge for omega at i = 413
+## trouble in wsolve
+## Failed to converge for omega at i = 414
+## trouble in wsolve
+## Failed to converge for omega at i = 415
+## trouble in wsolve
+## Failed to converge for omega at i = 416
+## trouble in wsolve
+## Failed to converge for omega at i = 417
+## trouble in wsolve
+## Failed to converge for omega at i = 418
+## trouble in wsolve
+## Failed to converge for omega at i = 419
+## trouble in wsolve
+## Failed to converge for omega at i = 420
+## trouble in wsolve
+## Failed to converge for omega at i = 421
+## trouble in wsolve
+## Failed to converge for omega at i = 422
+## trouble in wsolve
+## Failed to converge for omega at i = 423
+## trouble in wsolve
+## Failed to converge for omega at i = 424
+## trouble in wsolve
+## Failed to converge for omega at i = 425
+## trouble in wsolve
+## Failed to converge for omega at i = 426
+## trouble in wsolve
+## Failed to converge for omega at i = 427
+## trouble in wsolve
+## Failed to converge for omega at i = 428
+## trouble in wsolve
+## Failed to converge for omega at i = 429
+## trouble in wsolve
+## Failed to converge for omega at i = 430
+## trouble in wsolve
+## Failed to converge for omega at i = 431
+## trouble in wsolve
+## Failed to converge for omega at i = 432
+## trouble in wsolve
+## Failed to converge for omega at i = 433
+## trouble in wsolve
+## Failed to converge for omega at i = 434
+## trouble in wsolve
+## Failed to converge for omega at i = 435
+## trouble in wsolve
+## Failed to converge for omega at i = 436
+## trouble in wsolve
+## Failed to converge for omega at i = 437
+## trouble in wsolve
+## Failed to converge for omega at i = 438
+## trouble in wsolve
+## Failed to converge for omega at i = 439
+## trouble in wsolve
+## Failed to converge for omega at i = 440
+## trouble in wsolve
+## Failed to converge for omega at i = 441
+## trouble in wsolve
+## Failed to converge for omega at i = 442
+## trouble in wsolve
+## Failed to converge for omega at i = 443
+## trouble in wsolve
+## Failed to converge for omega at i = 444
+## trouble in wsolve
+## Failed to converge for omega at i = 445
+## trouble in wsolve
+## Failed to converge for omega at i = 446
+## trouble in wsolve
+## Failed to converge for omega at i = 447
+## trouble in wsolve
+## Failed to converge for omega at i = 448
+## trouble in wsolve
+## Failed to converge for omega at i = 449
+## trouble in wsolve
+## Failed to converge for omega at i = 450
+## trouble in wsolve
+## Failed to converge for omega at i = 451
+## trouble in wsolve
+## Failed to converge for omega at i = 452
+## trouble in wsolve
+## Failed to converge for omega at i = 453
+## trouble in wsolve
+## Failed to converge for omega at i = 454
+## trouble in wsolve
+## Failed to converge for omega at i = 455
+## trouble in wsolve
+## Failed to converge for omega at i = 456
+## trouble in wsolve
+## Failed to converge for omega at i = 457
+## trouble in wsolve
+## Failed to converge for omega at i = 458
+## trouble in wsolve
+## Failed to converge for omega at i = 459
+## trouble in wsolve
+## Failed to converge for omega at i = 460
+## trouble in wsolve
+## Failed to converge for omega at i = 461
+## trouble in wsolve
+## Failed to converge for omega at i = 462
+## trouble in wsolve
+## Failed to converge for omega at i = 463
+## trouble in wsolve
+## Failed to converge for omega at i = 464
+## trouble in wsolve
+## Failed to converge for omega at i = 465
+## trouble in wsolve
+## Failed to converge for omega at i = 466
+## trouble in wsolve
+## Failed to converge for omega at i = 467
+## trouble in wsolve
+## Failed to converge for omega at i = 468
+## trouble in wsolve
+## Failed to converge for omega at i = 469
+## trouble in wsolve
+## Failed to converge for omega at i = 470
+## trouble in wsolve
+## Failed to converge for omega at i = 471
+## trouble in wsolve
+## Failed to converge for omega at i = 472
+## trouble in wsolve
+## Failed to converge for omega at i = 473
+## trouble in wsolve
+## Failed to converge for omega at i = 474
+## trouble in wsolve
+## Failed to converge for omega at i = 475
+## trouble in wsolve
+## Failed to converge for omega at i = 476
+## trouble in wsolve
+## Failed to converge for omega at i = 477
+## trouble in wsolve
+## Failed to converge for omega at i = 478
+## trouble in wsolve
+## Failed to converge for omega at i = 479
+## trouble in wsolve
+## Failed to converge for omega at i = 480
+## trouble in wsolve
+## Failed to converge for omega at i = 481
+## trouble in wsolve
+## Failed to converge for omega at i = 482
+## trouble in wsolve
+## Failed to converge for omega at i = 483
+## trouble in wsolve
+## Failed to converge for omega at i = 484
+## trouble in wsolve
+## Failed to converge for omega at i = 485
+## trouble in wsolve
+## Failed to converge for omega at i = 486
+## trouble in wsolve
+## Failed to converge for omega at i = 487
+## trouble in wsolve
+## Failed to converge for omega at i = 488
+## trouble in wsolve
+## Failed to converge for omega at i = 489
+## trouble in wsolve
+## Failed to converge for omega at i = 490
+## trouble in wsolve
+## Failed to converge for omega at i = 491
+## trouble in wsolve
+## Failed to converge for omega at i = 492
+## trouble in wsolve
+## Failed to converge for omega at i = 493
+## trouble in wsolve
+## Failed to converge for omega at i = 494
+## trouble in wsolve
+## Failed to converge for omega at i = 495
+## trouble in wsolve
+## Failed to converge for omega at i = 496
+## trouble in wsolve
+## Failed to converge for omega at i = 497
+## trouble in wsolve
+## Failed to converge for omega at i = 498
+## trouble in wsolve
+## Failed to converge for omega at i = 499
+## trouble in wsolve
+## Failed to converge for omega at i = 500
+## 2915506.6, 4924.9, 43.7, 0.4, done.</code></pre>
+<pre class="r"><code>K &lt;- 2
+barplot(t(topics$omega),
+        col = 2:(K+1),
+        axisnames = F, space = 0,
+        border = NA,
+        main=paste(&quot;No. of clusters=&quot;, K),
+        las=1, ylim = c(0,1), cex.axis=1.5,cex.main=1.4)</code></pre>
+<p><img src="methclust_grid_presence_absence_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>plot(topics$freq[,1])</code></pre>
+<p><img src="methclust_grid_presence_absence_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>plot(topics$freq[,2])</code></pre>
+<p><img src="methclust_grid_presence_absence_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
