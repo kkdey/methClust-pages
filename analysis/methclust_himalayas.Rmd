@@ -1,0 +1,169 @@
+---
+title: 'methClust applications : Himalayan bird species'
+author: "Kushal K Dey"
+date: "12/12/2017"
+output: html_document
+---
+
+```{r message = FALSE, warning=FALSE}
+library(ecostructure)
+library(methClust)
+library(slam)
+```
+
+We use **methClust** to fit the presence-absence matrix of regional assemblage fields.
+
+## With Abundance 
+
+### Data Processing
+
+We take the counts data of abundances as Binomial counts $X_j$ with the assumption.
+
+$$  X_j \sim Bin (X_j, p_j)  \hspace{1 cm}  X_j > 0$$
+and
+
+$$ X_j \sim Bin (1, p_j)  \hspace{1 cm} X_j  =0 $$
+
+Then we fit grades of memberships on $p_j$ values. 
+
+Note that this model is definitely not a good model, but it does take into account the abundances instead of presence and absences, and I am trying to see how that affects the Grades of memberships.
+
+```{r}
+reg_data <- readRDS("../data/Him_site_x_cell_matrix.rds")
+#reg_data[reg_data > 0] = 1
+meth <- reg_data
+reg_data_2 <- reg_data
+reg_data_2[reg_data_2 > 0] = 1
+unmeth <- 1 - reg_data_2
+```
+
+
+### Fitting methClust model (different Ks)
+
+
+```{r echo=TRUE, eval=FALSE}
+
+topics <- meth_topics(meth, unmeth, 
+                      K=4, tol = 10, use_squarem = FALSE)
+
+```
+
+### Visualization of methClust model
+
+We plot the Structure plot representation of the regional assemblage grades of membership for different values of $K=2,3,4, 5$.
+
+#### K=2 
+
+```{r}
+topics <- get(load("../output/methClust_Himalayas_K_2_abundance.rda"))
+data <- get(load(system.file("extdata", "HimalayanBirdsData.rda",
+                             package = "ecostructure")))
+grid_metadata <- pData(phenoData(data))
+head(grid_metadata)
+elevation_metadata=grid_metadata$Elevation;
+east_west_dir = grid_metadata$WorE;
+omega <- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = "Elevation",
+               levels_decreasing = FALSE)
+```
+
+#### K=3
+
+```{r}
+topics <- get(load("../output/methClust_Himalayas_K_3_abundance.rda"))
+omega <- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = "Elevation",
+               levels_decreasing = FALSE)
+```
+
+#### K=4
+
+```{r}
+topics <- get(load("../output/methClust_Himalayas_K_4_abundance.rda"))
+omega <- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = "Elevation",
+               levels_decreasing = FALSE)
+```
+
+
+## Presence absence matrix
+
+Now we consider a more relaistic model of presence absence matrix, where we first concvert positive counts to just 1 
+
+$$ Y_j = I (X_j > 0) $$
+
+and then assume 
+
+$$  Y_j \sim Ber(p_j) $$
+
+and then fit grades of membership model on the $p_j$ values. 
+
+
+```{r}
+reg_data <- readRDS("../data/Him_site_x_cell_matrix.rds")
+reg_data[reg_data > 0] = 1
+meth <- reg_data
+unmeth <- 1 - reg_data
+```
+
+
+### Fitting methClust model (different Ks)
+
+
+```{r echo=TRUE, eval=FALSE}
+topics <- meth_topics(meth, unmeth, 
+                      K=4, tol = 10, use_squarem = FALSE)
+
+```
+
+### Visualization of methClust model
+
+We plot the Structure plot representation of the regional assemblage grades of membership for different values of $K=2,3,4, 5$.
+
+#### K=2 
+
+```{r}
+topics <- get(load("../output/methClust_Himalayas_K_2.rda"))
+data <- get(load(system.file("extdata", "HimalayanBirdsData.rda",
+                             package = "ecostructure")))
+grid_metadata <- pData(phenoData(data))
+head(grid_metadata)
+elevation_metadata=grid_metadata$Elevation;
+east_west_dir = grid_metadata$WorE;
+omega <- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = "Elevation",
+               levels_decreasing = FALSE)
+```
+
+#### K=3
+
+```{r}
+topics <- get(load("../output/methClust_Himalayas_K_3.rda"))
+omega <- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = "Elevation",
+               levels_decreasing = FALSE)
+```
+
+#### K=4
+
+```{r}
+topics <- get(load("../output/methClust_Himalayas_K_4.rda"))
+omega <- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = "Elevation",
+               levels_decreasing = FALSE)
+```
+
+
+

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Kushal K Dey" />
+
+<meta name="date" content="2017-12-12" />
+
+<title>methClust applications : Himalayan bird species</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">methClust-pages</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/jdblischak/workflowr">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">methClust applications : Himalayan bird species</h1>
+<h4 class="author"><em>Kushal K Dey</em></h4>
+<h4 class="date"><em>12/12/2017</em></h4>
+
+</div>
+
+
+<pre class="r"><code>library(ecostructure)
+library(methClust)
+library(slam)</code></pre>
+<p>We use <strong>methClust</strong> to fit the presence-absence matrix of regional assemblage fields.</p>
+<div id="with-abundance" class="section level2">
+<h2>With Abundance</h2>
+<div id="data-processing" class="section level3">
+<h3>Data Processing</h3>
+<p>We take the counts data of abundances as Binomial counts <span class="math inline">\(X_j\)</span> with the assumption.</p>
+<p><span class="math display">\[  X_j \sim Bin (X_j, p_j)  \hspace{1 cm}  X_j &gt; 0\]</span> and</p>
+<p><span class="math display">\[ X_j \sim Bin (1, p_j)  \hspace{1 cm} X_j  =0 \]</span></p>
+<p>Then we fit grades of memberships on <span class="math inline">\(p_j\)</span> values.</p>
+<p>Note that this model is definitely not a good model, but it does take into account the abundances instead of presence and absences, and I am trying to see how that affects the Grades of memberships.</p>
+<pre class="r"><code>reg_data &lt;- readRDS(&quot;../data/Him_site_x_cell_matrix.rds&quot;)
+#reg_data[reg_data &gt; 0] = 1
+meth &lt;- reg_data
+reg_data_2 &lt;- reg_data
+reg_data_2[reg_data_2 &gt; 0] = 1
+unmeth &lt;- 1 - reg_data_2</code></pre>
+</div>
+<div id="fitting-methclust-model-different-ks" class="section level3">
+<h3>Fitting methClust model (different Ks)</h3>
+<pre class="r"><code>topics &lt;- meth_topics(meth, unmeth, 
+                      K=4, tol = 10, use_squarem = FALSE)</code></pre>
+</div>
+<div id="visualization-of-methclust-model" class="section level3">
+<h3>Visualization of methClust model</h3>
+<p>We plot the Structure plot representation of the regional assemblage grades of membership for different values of <span class="math inline">\(K=2,3,4, 5\)</span>.</p>
+<div id="k2" class="section level4">
+<h4>K=2</h4>
+<pre class="r"><code>topics &lt;- get(load(&quot;../output/methClust_Himalayas_K_2_abundance.rda&quot;))
+data &lt;- get(load(system.file(&quot;extdata&quot;, &quot;HimalayanBirdsData.rda&quot;,
+                             package = &quot;ecostructure&quot;)))
+grid_metadata &lt;- pData(phenoData(data))
+head(grid_metadata)</code></pre>
+<pre><code>##    Elevation    North     East WorE
+## A2    198.25 26.97898 92.92198    E
+## A3    734.25 27.00627 92.40457    E
+## A4   1243.25 27.02750 92.41041    E
+## A6   2629.00 27.14773 92.45938    E
+## A7   2340.25 27.09198 92.40857    E
+## A8    300.00 26.96138 93.01216    E</code></pre>
+<pre class="r"><code>elevation_metadata=grid_metadata$Elevation;
+east_west_dir = grid_metadata$WorE;
+omega &lt;- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = &quot;Elevation&quot;,
+               levels_decreasing = FALSE)</code></pre>
+<p><img src="methclust_himalayas_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="k3" class="section level4">
+<h4>K=3</h4>
+<pre class="r"><code>topics &lt;- get(load(&quot;../output/methClust_Himalayas_K_3_abundance.rda&quot;))
+omega &lt;- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = &quot;Elevation&quot;,
+               levels_decreasing = FALSE)</code></pre>
+<p><img src="methclust_himalayas_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="k4" class="section level4">
+<h4>K=4</h4>
+<pre class="r"><code>topics &lt;- get(load(&quot;../output/methClust_Himalayas_K_4_abundance.rda&quot;))
+omega &lt;- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = &quot;Elevation&quot;,
+               levels_decreasing = FALSE)</code></pre>
+<p><img src="methclust_himalayas_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="presence-absence-matrix" class="section level2">
+<h2>Presence absence matrix</h2>
+<p>Now we consider a more relaistic model of presence absence matrix, where we first concvert positive counts to just 1</p>
+<p><span class="math display">\[ Y_j = I (X_j &gt; 0) \]</span></p>
+<p>and then assume</p>
+<p><span class="math display">\[  Y_j \sim Ber(p_j) \]</span></p>
+<p>and then fit grades of membership model on the <span class="math inline">\(p_j\)</span> values.</p>
+<pre class="r"><code>reg_data &lt;- readRDS(&quot;../data/Him_site_x_cell_matrix.rds&quot;)
+reg_data[reg_data &gt; 0] = 1
+meth &lt;- reg_data
+unmeth &lt;- 1 - reg_data</code></pre>
+<div id="fitting-methclust-model-different-ks-1" class="section level3">
+<h3>Fitting methClust model (different Ks)</h3>
+<pre class="r"><code>topics &lt;- meth_topics(meth, unmeth, 
+                      K=4, tol = 10, use_squarem = FALSE)</code></pre>
+</div>
+<div id="visualization-of-methclust-model-1" class="section level3">
+<h3>Visualization of methClust model</h3>
+<p>We plot the Structure plot representation of the regional assemblage grades of membership for different values of <span class="math inline">\(K=2,3,4, 5\)</span>.</p>
+<div id="k2-1" class="section level4">
+<h4>K=2</h4>
+<pre class="r"><code>topics &lt;- get(load(&quot;../output/methClust_Himalayas_K_2.rda&quot;))
+data &lt;- get(load(system.file(&quot;extdata&quot;, &quot;HimalayanBirdsData.rda&quot;,
+                             package = &quot;ecostructure&quot;)))
+grid_metadata &lt;- pData(phenoData(data))
+head(grid_metadata)</code></pre>
+<pre><code>##    Elevation    North     East WorE
+## A2    198.25 26.97898 92.92198    E
+## A3    734.25 27.00627 92.40457    E
+## A4   1243.25 27.02750 92.41041    E
+## A6   2629.00 27.14773 92.45938    E
+## A7   2340.25 27.09198 92.40857    E
+## A8    300.00 26.96138 93.01216    E</code></pre>
+<pre class="r"><code>elevation_metadata=grid_metadata$Elevation;
+east_west_dir = grid_metadata$WorE;
+omega &lt;- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = &quot;Elevation&quot;,
+               levels_decreasing = FALSE)</code></pre>
+<p><img src="methclust_himalayas_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+<div id="k3-1" class="section level4">
+<h4>K=3</h4>
+<pre class="r"><code>topics &lt;- get(load(&quot;../output/methClust_Himalayas_K_3.rda&quot;))
+omega &lt;- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = &quot;Elevation&quot;,
+               levels_decreasing = FALSE)</code></pre>
+<p><img src="methclust_himalayas_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+<div id="k4-1" class="section level4">
+<h4>K=4</h4>
+<pre class="r"><code>topics &lt;- get(load(&quot;../output/methClust_Himalayas_K_4.rda&quot;))
+omega &lt;- topics$omega
+BlockStructure(omega, blocker_metadata = east_west_dir,
+               order_metadata = elevation_metadata,
+               yaxis_label = &quot;Elevation&quot;,
+               levels_decreasing = FALSE)</code></pre>
+<p><img src="methclust_himalayas_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+<hr>
+<p>
+    This <a href="http://rmarkdown.rstudio.com">R Markdown</a> site was created with <a href="https://github.com/jdblischak/workflowr">workflowr</a>
+</p>
+<hr>
+
+<!-- To enable disqus, uncomment the section below and provide your disqus_shortname -->
+
+<!-- disqus
+  <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rmarkdown'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+-->
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

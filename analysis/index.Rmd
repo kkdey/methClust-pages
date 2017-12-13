@@ -17,6 +17,8 @@ We first apply a special elementary version **methClust** on Bernoulli or presen
 
 [Application of methClust on binary presence-absence data: Alex White Birds](ecostructure_fit.html)
 
+[Application of methClust on regional assemblage data: Alex White Birds](methclust_himalayas.html)
+
 [Grid simulation testing with presence-absence data](methclust_grid_presence_absence.html)
 
 
