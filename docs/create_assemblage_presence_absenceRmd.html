@@ -394,6 +394,32 @@ library(rgdal)</code></pre>
 <p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-4-1.png" width="672" /> ## Original Assemblage</p>
 <pre class="r"><code>old_assemblage &lt;- readRDS(&quot;../data/global_disp_field_matrix_breeding_birds_rds.rds&quot;)</code></pre>
 <p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>We further tried to investigate if the constructed assemblage indeed matches with the original assemblage.</p>
+<pre class="r"><code>par(mfrow=c(1,2))
+plot(old_assemblage[1,])
+plot(new_assemblage[1,])</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>or</p>
+<pre class="r"><code>par(mfrow=c(1,2))
+plot(old_assemblage[10000,])
+plot(new_assemblage[10000,])</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>which seem to match. But it mainly seems that the row labels for the constructed assemblage is wrong.</p>
+<pre class="r"><code>new_assemblage[1:5,1:5]</code></pre>
+<pre><code>##    52 53 54 80 81
+## 52 20 20 20  4  4
+## 53 20 20 20  4  4
+## 54 20 20 20  4  4
+## 80  4  4  4  6  6
+## 81  4  4  4  6  6</code></pre>
+<pre class="r"><code>old_assemblage[as.numeric(rownames(new_assemblage)[1:5]), as.numeric(rownames(new_assemblage)[1:5])]</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    0    0    0    0    0
+## [2,]    0    0    0    0    0
+## [3,]    0    0    0    0    0
+## [4,]    0    0    0    0    0
+## [5,]    0    0    0    0    0</code></pre>
+<p>You can see that the row labels clearly do not match.</p>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using

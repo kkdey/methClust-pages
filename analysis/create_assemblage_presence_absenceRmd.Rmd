@@ -123,3 +123,28 @@ motif.theta.maps <- levelplot(crop(motif_maps,e),
 motif.theta.maps
 
 ```
+
+We further tried to investigate if the constructed assemblage indeed matches with the original assemblage.
+
+```{r}
+par(mfrow=c(1,2))
+plot(old_assemblage[1,])
+plot(new_assemblage[1,])
+```
+
+or 
+
+```{r}
+par(mfrow=c(1,2))
+plot(old_assemblage[10000,])
+plot(new_assemblage[10000,])
+```
+
+which seem to match. But it mainly seems that the row labels for the constructed assemblage is wrong.
+
+```{r}
+new_assemblage[1:5,1:5]
+old_assemblage[as.numeric(rownames(new_assemblage)[1:5]), as.numeric(rownames(new_assemblage)[1:5])]
+```
+You can see that the row labels clearly do not match. 
+
