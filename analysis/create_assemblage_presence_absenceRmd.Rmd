@@ -1,0 +1,125 @@
+---
+title: "Creating assemblage fields from cells by birds presence absences"
+author: "Kushal K Dey"
+date: "12/17/2017"
+output: html_document
+---
+
+```{r}
+library(ecostructure)
+library(Biobase)
+library(rasterVis)
+library(gtools)
+library(bigalgebra)
+library(sp)
+library(rgdal)
+```
+
+```{r, echo=F, message=FALSE, warning=FALSE}
+
+crs <- CRS("+proj=longlat +datum=WGS84")
+
+myPalette <- colorRampPalette(rev(c("red","lemonchiffon","blue")))
+climate <- getData('worldclim', var='bio', res=10)
+
+temperate <- climate$bio6
+tropical <- climate$bio6
+
+temperate[temperate > 0] <- NA
+tropical[tropical < 0] <- NA
+
+ocean <- readOGR(dsn = path.expand("../data/ne_110m_ocean/ne_110m_ocean.shp"),
+                 layer ="ne_110m_ocean")
+                 
+coast <- readOGR(dsn = path.expand("../data/ne_110m_coastline/ne_110m_coastline.shp"),
+                 layer ="ne_110m_coastline")
+                 
+myTheme <- rasterTheme(region = myPalette(100))
+
+```
+## Constructed Assemblage
+
+```{r}
+new_assemblage <- get(load("../output/constructed_assemblage.rda"))
+```
+
+```{r, echo=FALSE}
+####
+######## k2
+#load(file="birds_cluster_2.rda")
+idx <- 12000
+
+theta <- new_assemblage[idx,]
+v <- rep(0,64800)
+v[as.numeric(names(theta))] = theta
+motif <- matrix(v, nrow = 180, ncol = 360)
+
+proj <- CRS(' +proj=longlat +ellps=WGS84')
+map.extent <- extent(-180,180,-90,90)
+
+newtheme <- rasterTheme(region = colorRampPalette(c("darkseagreen3","orange","red"))( 1000 ))
+
+xmin <- -180
+xmax <- 180
+ymin <- -90
+ymax <- 90
+
+motif_maps <- raster(motif, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
+
+e <- extent(-180, 180, -60, 90)
+
+motif.theta.maps <- levelplot(crop(motif_maps,e), 
+            main=paste("Map cell contributions for site ",idx),
+            par.settings=newtheme, 
+            contour=F,margin=FALSE,
+            colorkey=list(at=seq(0, 100, 1),
+          labels=list(at=c(0,100),                                                              labels=c("Low", "High"))))+
+    latticeExtra::layer(sp.lines(coast, col='black', lwd=0.5))+
+    latticeExtra::layer(sp.polygons(ocean, fill='grey', col='black'))
+
+motif.theta.maps
+
+```
+## Original Assemblage
+
+```{r}
+old_assemblage <- readRDS("../data/global_disp_field_matrix_breeding_birds_rds.rds")
+```
+
+```{r, echo=FALSE}
+####
+######## k2
+#load(file="birds_cluster_2.rda")
+idx <- 12000
+
+theta <- old_assemblage[idx,]
+v <- rep(0,64800)
+v = theta
+motif <- matrix(v, nrow = 180, ncol = 360)
+
+proj <- CRS(' +proj=longlat +ellps=WGS84')
+map.extent <- extent(-180,180,-90,90)
+
+newtheme <- rasterTheme(region = colorRampPalette(c("darkseagreen3","orange","red"))( 1000 ))
+
+xmin <- -180
+xmax <- 180
+ymin <- -90
+ymax <- 90
+
+motif_maps <- raster(motif, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
+
+e <- extent(-180, 180, -60, 90)
+
+motif.theta.maps <- levelplot(crop(motif_maps,e), 
+            main=paste("Map cell contributions for site ",idx),
+            par.settings=newtheme, 
+            contour=F,margin=FALSE,
+            colorkey=list(at=seq(0, 100, 1),
+          labels=list(at=c(0,100),                                                              labels=c("Low", "High"))))+
+    latticeExtra::layer(sp.lines(coast, col='black', lwd=0.5))+
+    latticeExtra::layer(sp.polygons(ocean, fill='grey', col='black'))
+
+motif.theta.maps
+
+```

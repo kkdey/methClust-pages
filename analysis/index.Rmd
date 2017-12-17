@@ -21,6 +21,10 @@ We first apply a special elementary version **methClust** on Bernoulli or presen
 
 [Grid simulation testing with presence-absence data](methclust_grid_presence_absence.html)
 
+[Original asemblage vs Constructed assemblage from birds presence absence](create_assemblage_presence_absenceRmd.html)
+
+[Birds->cells versus cells-> birds analysis](birds_cells_versus_cells_birds.html)
+
 
 ## General methClust applications (methylation examples)
 

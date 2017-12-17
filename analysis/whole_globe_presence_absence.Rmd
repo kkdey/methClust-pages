@@ -1,0 +1,32 @@
+---
+title: "Whole globe birds presence-absence"
+author: "Kushal K Dey"
+date: "12/16/2017"
+output: html_document
+---
+
+```{r message = FALSE, warning=FALSE}
+library(ecostructure)
+library(methClust)
+library(slam)
+```
+
+```{r}
+data <- readRDS("../data/birds_presab_land_breeding_counts.rds")
+```
+
+```{r}
+colnames(data) <- 1:dim(data)[2]
+data_2 <- data[, which(colSums(data) != 0)]
+dim(data_2)
+```
+
+```{r eval=TRUE, warning = FALSE, message = FALSE}
+topics <- meth_topics(data_2, 1-data_2, K=2, tol = 100, use_squarem = FALSE)
+```
+
+
+```{r}
+topics <- get(load("../output/whole_globe_birds_topics_2.rda"))
+```
+
