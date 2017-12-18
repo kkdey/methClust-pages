@@ -27,6 +27,8 @@ We first apply a special elementary version **methClust** on Bernoulli or presen
 
 [Binary methClust analysis of *Birds by cells* compared to *Cells by Birds* presence absence data : White et al (2018)](birds_cells_versus_cells_birds.html)
 
+[Binary methClust detects Wallace Line as transition boundary between bird communities : White et al (2008)](methClust_Wallace.html)
+
 
 ## General methClust applications (methylation examples)
 
