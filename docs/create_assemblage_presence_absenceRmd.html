@@ -317,109 +317,94 @@ div.section {
 </div>
 
 
-<pre class="r"><code>library(ecostructure)</code></pre>
-<pre><code>## Loading required package: ggplot2</code></pre>
-<pre><code>## Warning: replacing previous import &#39;ape::rotate&#39; by &#39;raster::rotate&#39; when
-## loading &#39;ecostructure&#39;</code></pre>
-<pre><code>## Warning: replacing previous import &#39;ape::zoom&#39; by &#39;raster::zoom&#39; when
-## loading &#39;ecostructure&#39;</code></pre>
-<pre><code>## Warning: replacing previous import &#39;raster::density&#39; by &#39;stats::density&#39;
-## when loading &#39;ecostructure&#39;</code></pre>
-<pre class="r"><code>library(Biobase)</code></pre>
-<pre><code>## Loading required package: BiocGenerics</code></pre>
-<pre><code>## Loading required package: parallel</code></pre>
-<pre><code>## 
-## Attaching package: &#39;BiocGenerics&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:parallel&#39;:
-## 
-##     clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
-##     clusterExport, clusterMap, parApply, parCapply, parLapply,
-##     parLapplyLB, parRapply, parSapply, parSapplyLB</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     IQR, mad, sd, var, xtabs</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     anyDuplicated, append, as.data.frame, cbind, colMeans,
-##     colnames, colSums, do.call, duplicated, eval, evalq, Filter,
-##     Find, get, grep, grepl, intersect, is.unsorted, lapply,
-##     lengths, Map, mapply, match, mget, order, paste, pmax,
-##     pmax.int, pmin, pmin.int, Position, rank, rbind, Reduce,
-##     rowMeans, rownames, rowSums, sapply, setdiff, sort, table,
-##     tapply, union, unique, unsplit, which, which.max, which.min</code></pre>
-<pre><code>## Welcome to Bioconductor
-## 
-##     Vignettes contain introductory material; view with
-##     &#39;browseVignettes()&#39;. To cite Bioconductor, see
-##     &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
-<pre class="r"><code>library(rasterVis)</code></pre>
-<pre><code>## Loading required package: raster</code></pre>
-<pre><code>## Loading required package: sp</code></pre>
-<pre><code>## Loading required package: lattice</code></pre>
-<pre><code>## Loading required package: latticeExtra</code></pre>
-<pre><code>## Loading required package: RColorBrewer</code></pre>
-<pre><code>## 
-## Attaching package: &#39;latticeExtra&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
-## 
-##     layer</code></pre>
-<pre class="r"><code>library(gtools)
-library(bigalgebra)</code></pre>
-<pre><code>## Loading required package: bigmemory</code></pre>
-<pre><code>## Warning: package &#39;bigmemory&#39; was built under R version 3.4.3</code></pre>
-<pre><code>## Loading required package: bigmemory.sri</code></pre>
-<pre class="r"><code>library(sp)
-library(rgdal)</code></pre>
-<pre><code>## Warning: package &#39;rgdal&#39; was built under R version 3.4.3</code></pre>
-<pre><code>## rgdal: version: 1.2-16, (SVN revision 701)
-##  Geospatial Data Abstraction Library extensions to R successfully loaded
-##  Loaded GDAL runtime: GDAL 2.1.3, released 2017/20/01
-##  Path to GDAL shared files: /Users/kushal/Library/R/3.4/library/rgdal/gdal
-##  GDAL binary built with GEOS: FALSE 
-##  Loaded PROJ.4 runtime: Rel. 4.9.3, 15 August 2016, [PJ_VERSION: 493]
-##  Path to PROJ.4 shared files: /Users/kushal/Library/R/3.4/library/rgdal/proj
-##  Linking to sp version: 1.2-5</code></pre>
-<pre><code>## OGR data source with driver: ESRI Shapefile 
-## Source: &quot;../data/ne_110m_ocean/ne_110m_ocean.shp&quot;, layer: &quot;ne_110m_ocean&quot;
-## with 2 features
-## It has 2 fields</code></pre>
-<pre><code>## OGR data source with driver: ESRI Shapefile 
-## Source: &quot;../data/ne_110m_coastline/ne_110m_coastline.shp&quot;, layer: &quot;ne_110m_coastline&quot;
-## with 134 features
-## It has 3 fields
-## Integer64 fields read as strings:  scalerank</code></pre>
+<pre class="r"><code>library(ggplot2)
+library(ggthemes)
+library(maps)</code></pre>
 <div id="constructed-assemblage" class="section level2">
 <h2>Constructed Assemblage</h2>
 <pre class="r"><code>new_assemblage &lt;- get(load(&quot;../output/constructed_assemblage.rda&quot;))</code></pre>
-<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-4-1.png" width="672" /> ## Original Assemblage</p>
+</div>
+<div id="original-assemblage" class="section level2">
+<h2>Original Assemblage</h2>
 <pre class="r"><code>old_assemblage &lt;- readRDS(&quot;../data/global_disp_field_matrix_breeding_birds_rds.rds&quot;)</code></pre>
-<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-<p>We further tried to investigate if the constructed assemblage indeed matches with the original assemblage.</p>
-<pre class="r"><code>par(mfrow=c(1,2))
-plot(old_assemblage[1,])
-plot(new_assemblage[1,])</code></pre>
+</div>
+<div id="assemblage-map-function" class="section level2">
+<h2>Assemblage Map Function</h2>
+<p>We load the latitude and longitude data for each site for the newly constructed assemblage as well as the older assemblage.</p>
+<pre class="r"><code>latlong &lt;- get(load(&quot;../data/LatLongCells_frame.rda&quot;))</code></pre>
+<p>We write the plotting function.</p>
+<pre class="r"><code>world_map &lt;- map_data(&quot;world&quot;)
+world_map &lt;- world_map[world_map$region != &quot;Antarctica&quot;,] # intercourse antarctica
+
+p &lt;- ggplot() + coord_fixed() +
+  xlab(&quot;&quot;) + ylab(&quot;&quot;)
+
+#Add map to base plot
+base_world_messy &lt;- p + geom_map(data=world_map, map = world_map, aes(group=group, map_id=region), colour=&quot;white&quot;, fill=&quot;white&quot;, size=0.05, alpha=1/4) 
+
+cleanup &lt;- 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = &#39;white&#39;, colour = &#39;white&#39;), 
+        axis.line = element_line(colour = &quot;white&quot;), legend.position=&quot;none&quot;,
+        axis.ticks=element_blank(), axis.text.x=element_blank(),
+        axis.text.y=element_blank())
+
+base_world &lt;- base_world_messy + cleanup</code></pre>
+<pre class="r"><code>PlotAssemblageIdx &lt;- function(idx){
+  dat &lt;- cbind.data.frame(latlong, new_assemblage[,idx])
+colnames(dat) &lt;- c(&quot;Latitude&quot;, &quot;Longitude&quot;, &quot;Value&quot;)
+map_data_coloured &lt;- 
+  base_world +
+  geom_point(data=dat, 
+             aes(x=Latitude, y=Longitude, colour=Value), size=0.5) +
+  scale_colour_gradient(low = &quot;white&quot;, high = &quot;black&quot;) 
+
+map_data_coloured
+}</code></pre>
+</div>
+<div id="example-plots-of-sites" class="section level2">
+<h2>Example Plots of sites</h2>
+<pre class="r"><code>par(mfrow = c(10, 2))
+PlotAssemblageIdx(500)</code></pre>
 <p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-<p>or</p>
-<pre class="r"><code>par(mfrow=c(1,2))
-plot(old_assemblage[10000,])
-plot(new_assemblage[10000,])</code></pre>
-<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
-<p>which seem to match. But it mainly seems that the row labels for the constructed assemblage is wrong.</p>
-<pre class="r"><code>new_assemblage[1:5,1:5]</code></pre>
-<pre><code>##    52 53 54 80 81
-## 52 20 20 20  4  4
-## 53 20 20 20  4  4
-## 54 20 20 20  4  4
-## 80  4  4  4  6  6
-## 81  4  4  4  6  6</code></pre>
-<pre class="r"><code>old_assemblage[as.numeric(rownames(new_assemblage)[1:5]), as.numeric(rownames(new_assemblage)[1:5])]</code></pre>
-<pre><code>##      [,1] [,2] [,3] [,4] [,5]
-## [1,]    0    0    0    0    0
-## [2,]    0    0    0    0    0
-## [3,]    0    0    0    0    0
-## [4,]    0    0    0    0    0
-## [5,]    0    0    0    0    0</code></pre>
-<p>You can see that the row labels clearly do not match.</p>
+<pre class="r"><code>PlotAssemblageIdx(1000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(1500)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-3.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(2000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-4.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(3000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-5.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(4000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-6.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(5000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-7.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(7000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-8.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(8000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-9.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(9000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-10.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(10000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-11.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(11000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-12.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(12000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-13.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(13000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-14.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(14000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-15.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(15000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-16.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(15500)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-17.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(16000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-18.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(16500)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-19.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(17000)</code></pre>
+<p><img src="create_assemblage_presence_absenceRmd_files/figure-html/unnamed-chunk-7-20.png" width="672" /></p>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using

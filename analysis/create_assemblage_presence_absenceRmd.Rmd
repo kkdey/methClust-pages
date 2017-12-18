@@ -6,145 +6,97 @@ output: html_document
 ---
 
 ```{r}
-library(ecostructure)
-library(Biobase)
-library(rasterVis)
-library(gtools)
-library(bigalgebra)
-library(sp)
-library(rgdal)
+library(ggplot2)
+library(ggthemes)
+library(maps)
 ```
 
-```{r, echo=F, message=FALSE, warning=FALSE}
 
-crs <- CRS("+proj=longlat +datum=WGS84")
-
-myPalette <- colorRampPalette(rev(c("red","lemonchiffon","blue")))
-climate <- getData('worldclim', var='bio', res=10)
-
-temperate <- climate$bio6
-tropical <- climate$bio6
-
-temperate[temperate > 0] <- NA
-tropical[tropical < 0] <- NA
-
-ocean <- readOGR(dsn = path.expand("../data/ne_110m_ocean/ne_110m_ocean.shp"),
-                 layer ="ne_110m_ocean")
-                 
-coast <- readOGR(dsn = path.expand("../data/ne_110m_coastline/ne_110m_coastline.shp"),
-                 layer ="ne_110m_coastline")
-                 
-myTheme <- rasterTheme(region = myPalette(100))
-
-```
 ## Constructed Assemblage
 
 ```{r}
 new_assemblage <- get(load("../output/constructed_assemblage.rda"))
 ```
 
-```{r, echo=FALSE}
-####
-######## k2
-#load(file="birds_cluster_2.rda")
-idx <- 12000
 
-theta <- new_assemblage[idx,]
-v <- rep(0,64800)
-v[as.numeric(names(theta))] = theta
-motif <- matrix(v, nrow = 180, ncol = 360)
-
-proj <- CRS(' +proj=longlat +ellps=WGS84')
-map.extent <- extent(-180,180,-90,90)
-
-newtheme <- rasterTheme(region = colorRampPalette(c("darkseagreen3","orange","red"))( 1000 ))
-
-xmin <- -180
-xmax <- 180
-ymin <- -90
-ymax <- 90
-
-motif_maps <- raster(motif, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-
-e <- extent(-180, 180, -60, 90)
-
-motif.theta.maps <- levelplot(crop(motif_maps,e), 
-            main=paste("Map cell contributions for site ",idx),
-            par.settings=newtheme, 
-            contour=F,margin=FALSE,
-            colorkey=list(at=seq(0, 100, 1),
-          labels=list(at=c(0,100),                                                              labels=c("Low", "High"))))+
-    latticeExtra::layer(sp.lines(coast, col='black', lwd=0.5))+
-    latticeExtra::layer(sp.polygons(ocean, fill='grey', col='black'))
-
-motif.theta.maps
-
-```
 ## Original Assemblage
 
 ```{r}
 old_assemblage <- readRDS("../data/global_disp_field_matrix_breeding_birds_rds.rds")
 ```
 
-```{r, echo=FALSE}
-####
-######## k2
-#load(file="birds_cluster_2.rda")
-idx <- 12000
+## Assemblage Map Function
 
-theta <- old_assemblage[idx,]
-v <- rep(0,64800)
-v = theta
-motif <- matrix(v, nrow = 180, ncol = 360)
-
-proj <- CRS(' +proj=longlat +ellps=WGS84')
-map.extent <- extent(-180,180,-90,90)
-
-newtheme <- rasterTheme(region = colorRampPalette(c("darkseagreen3","orange","red"))( 1000 ))
-
-xmin <- -180
-xmax <- 180
-ymin <- -90
-ymax <- 90
-
-motif_maps <- raster(motif, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-
-e <- extent(-180, 180, -60, 90)
-
-motif.theta.maps <- levelplot(crop(motif_maps,e), 
-            main=paste("Map cell contributions for site ",idx),
-            par.settings=newtheme, 
-            contour=F,margin=FALSE,
-            colorkey=list(at=seq(0, 100, 1),
-          labels=list(at=c(0,100),                                                              labels=c("Low", "High"))))+
-    latticeExtra::layer(sp.lines(coast, col='black', lwd=0.5))+
-    latticeExtra::layer(sp.polygons(ocean, fill='grey', col='black'))
-
-motif.theta.maps
-
-```
-
-We further tried to investigate if the constructed assemblage indeed matches with the original assemblage.
+We load the latitude and longitude data for each site for the newly constructed assemblage as well as the older assemblage.
 
 ```{r}
-par(mfrow=c(1,2))
-plot(old_assemblage[1,])
-plot(new_assemblage[1,])
+latlong <- get(load("../data/LatLongCells_frame.rda"))
 ```
 
-or 
+
+We write the plotting function.
 
 ```{r}
-par(mfrow=c(1,2))
-plot(old_assemblage[10000,])
-plot(new_assemblage[10000,])
-```
+world_map <- map_data("world")
+world_map <- world_map[world_map$region != "Antarctica",] # intercourse antarctica
 
-which seem to match. But it mainly seems that the row labels for the constructed assemblage is wrong.
+p <- ggplot() + coord_fixed() +
+  xlab("") + ylab("")
+
+#Add map to base plot
+base_world_messy <- p + geom_map(data=world_map, map = world_map, aes(group=group, map_id=region), colour="white", fill="white", size=0.05, alpha=1/4) 
+
+cleanup <- 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = 'white', colour = 'white'), 
+        axis.line = element_line(colour = "white"), legend.position="none",
+        axis.ticks=element_blank(), axis.text.x=element_blank(),
+        axis.text.y=element_blank())
+
+base_world <- base_world_messy + cleanup
+
+```
 
 ```{r}
-new_assemblage[1:5,1:5]
-old_assemblage[as.numeric(rownames(new_assemblage)[1:5]), as.numeric(rownames(new_assemblage)[1:5])]
+PlotAssemblageIdx <- function(idx){
+  dat <- cbind.data.frame(latlong, new_assemblage[,idx])
+colnames(dat) <- c("Latitude", "Longitude", "Value")
+map_data_coloured <- 
+  base_world +
+  geom_point(data=dat, 
+             aes(x=Latitude, y=Longitude, colour=Value), size=0.5) +
+  scale_colour_gradient(low = "white", high = "black") 
+
+map_data_coloured
+}
+
 ```
-You can see that the row labels clearly do not match. 
+
+## Example Plots of sites
+
+```{r}
+par(mfrow = c(10, 2))
+PlotAssemblageIdx(500)
+PlotAssemblageIdx(1000)
+PlotAssemblageIdx(1500)
+PlotAssemblageIdx(2000)
+PlotAssemblageIdx(3000)
+PlotAssemblageIdx(4000)
+PlotAssemblageIdx(5000)
+PlotAssemblageIdx(7000)
+PlotAssemblageIdx(8000)
+PlotAssemblageIdx(9000)
+PlotAssemblageIdx(10000)
+PlotAssemblageIdx(11000)
+PlotAssemblageIdx(12000)
+PlotAssemblageIdx(13000)
+PlotAssemblageIdx(14000)
+PlotAssemblageIdx(15000)
+PlotAssemblageIdx(15500)
+PlotAssemblageIdx(16000)
+PlotAssemblageIdx(16500)
+PlotAssemblageIdx(17000)
+```
+
+
 
