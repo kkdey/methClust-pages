@@ -13,7 +13,7 @@
 
 <meta name="date" content="2017-12-16" />
 
-<title>Birds by cells versus cells by birda analysis</title>
+<title>Birds by cells versus cells by birds analysis</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -310,70 +310,109 @@ div.section {
 
 
 
-<h1 class="title toc-ignore">Birds by cells versus cells by birda analysis</h1>
+<h1 class="title toc-ignore">Birds by cells versus cells by birds analysis</h1>
 <h4 class="author"><em>Kushal K Dey</em></h4>
 <h4 class="date"><em>12/16/2017</em></h4>
 
 </div>
 
 
-<pre><code>## OGR data source with driver: ESRI Shapefile 
-## Source: &quot;../data/ne_110m_ocean/ne_110m_ocean.shp&quot;, layer: &quot;ne_110m_ocean&quot;
-## with 2 features
-## It has 2 fields</code></pre>
-<pre><code>## OGR data source with driver: ESRI Shapefile 
-## Source: &quot;../data/ne_110m_coastline/ne_110m_coastline.shp&quot;, layer: &quot;ne_110m_coastline&quot;
-## with 134 features
-## It has 3 fields
-## Integer64 fields read as strings:  scalerank</code></pre>
-<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-1-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-1-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-1-3.png" width="672" /></p>
+<p>We compare the methClust model fit on the sites by bird species presence absence matrix with the bird species by sites presence absence matrix.</p>
+<div id="plotting-function-of-clusters" class="section level2">
+<h2>Plotting function of clusters</h2>
+<pre class="r"><code>latlong &lt;- get(load(&quot;../data/LatLongCells_frame.rda&quot;))</code></pre>
+<pre class="r"><code>world_map &lt;- map_data(&quot;world&quot;)
+world_map &lt;- world_map[world_map$region != &quot;Antarctica&quot;,] # intercourse antarctica
+
+p &lt;- ggplot() + coord_fixed() +
+  xlab(&quot;&quot;) + ylab(&quot;&quot;)
+
+#Add map to base plot
+base_world_messy &lt;- p + geom_map(data=world_map, map = world_map, aes(group=group, map_id=region), colour=&quot;white&quot;, fill=&quot;white&quot;, size=0.05, alpha=1/4) 
+
+cleanup &lt;- 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = &#39;white&#39;, colour = &#39;white&#39;), 
+        axis.line = element_line(colour = &quot;white&quot;), legend.position=&quot;none&quot;,
+        axis.ticks=element_blank(), axis.text.x=element_blank(),
+        axis.text.y=element_blank())
+
+base_world &lt;- base_world_messy + cleanup</code></pre>
+<pre class="r"><code>PlotAssemblageIdx &lt;- function(dat){
+  dat &lt;- cbind.data.frame(latlong, dat)
+colnames(dat) &lt;- c(&quot;Latitude&quot;, &quot;Longitude&quot;, &quot;Value&quot;)
+map_data_coloured &lt;- 
+  base_world +
+  geom_point(data=dat, 
+             aes(x=Latitude, y=Longitude, colour=Value), size=0.5) +
+  scale_colour_gradient(low = &quot;white&quot;, high = &quot;black&quot;) 
+
+map_data_coloured
+}</code></pre>
+</div>
 <div id="k-2" class="section level2">
 <h2>K = 2</h2>
 <div id="cells---birds" class="section level3">
 <h3>(cells -&gt; birds)</h3>
-<p>Results for K = 2:</p>
-<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-2-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre class="r"><code>K2_global_topics &lt;- get(load(file=&quot;../output/birds_meth_cluster_2.rda&quot;))
+
+topics_omega &lt;- K2_global_topics$omega
+PlotAssemblageIdx(topics_omega[,1])</code></pre>
+<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>PlotAssemblageIdx(topics_omega[,2])</code></pre>
+<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
 </div>
 <div id="birds---cells" class="section level3">
 <h3>(birds -&gt; cells)</h3>
 <p>Results for K = 2:</p>
-<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-3-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-5-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
 </div>
 </div>
 <div id="k-3" class="section level2">
 <h2>K = 3</h2>
 <div id="cells---birds-1" class="section level3">
 <h3>(cells -&gt; birds)</h3>
-<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-4-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-4-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-4-3.png" width="672" /></p>
+<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-6-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-6-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-6-3.png" width="672" /></p>
 </div>
 <div id="birds---cells-1" class="section level3">
 <h3>(birds -&gt; cells)</h3>
 <p>Results for K = 3:</p>
-<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-5-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-5-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
+<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-7-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-7-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-7-3.png" width="672" /></p>
 </div>
 </div>
 <div id="k-5" class="section level2">
 <h2>K = 5</h2>
 <div id="cells---birds-2" class="section level3">
 <h3>(cells -&gt; birds)</h3>
-<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-6-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-6-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-6-3.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-6-4.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-6-5.png" width="672" /></p>
+<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-3.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-4.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-5.png" width="672" /></p>
 </div>
 <div id="birds---cells-2" class="section level3">
 <h3>(birds -&gt; cells)</h3>
 <p>Results for K = 5:</p>
-<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-7-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-7-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-7-3.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-7-4.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-7-5.png" width="672" /></p>
+<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-3.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-4.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-5.png" width="672" /></p>
 </div>
 </div>
 <div id="k-10" class="section level2">
 <h2>K = 10</h2>
 <div id="cells---birds-3" class="section level3">
 <h3>(cells -&gt; birds)</h3>
-<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-3.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-4.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-5.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-6.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-7.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-8.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-9.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-8-10.png" width="672" /></p>
+<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-10-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-10-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-10-3.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-10-4.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-10-5.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-10-6.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-10-7.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-10-8.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-10-9.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-10-10.png" width="672" /></p>
 </div>
 <div id="birds---cells-3" class="section level3">
 <h3>(birds -&gt; cells)</h3>
 <p>Results for K = 10:</p>
-<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-3.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-4.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-5.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-6.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-7.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-8.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-9.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-9-10.png" width="672" /></p>
+<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-11-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-11-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-11-3.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-11-4.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-11-5.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-11-6.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-11-7.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-11-8.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-11-9.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-11-10.png" width="672" /></p>
+</div>
+</div>
+<div id="k-11" class="section level2">
+<h2>K = 11</h2>
+<div id="cells---birds-4" class="section level3">
+<h3>(cells -&gt; birds)</h3>
+<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-12-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-12-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-12-3.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-12-4.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-12-5.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-12-6.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-12-7.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-12-8.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-12-9.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-12-10.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-12-11.png" width="672" /></p>
+</div>
+<div id="birds---cells-4" class="section level3">
+<h3>(birds -&gt; cells)</h3>
+<p><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-13-1.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-13-2.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-13-3.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-13-4.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-13-5.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-13-6.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-13-7.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-13-8.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-13-9.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-13-10.png" width="672" /><img src="birds_cells_versus_cells_birds_files/figure-html/unnamed-chunk-13-11.png" width="672" /></p>
 </div>
 </div>
 

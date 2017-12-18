@@ -13,17 +13,19 @@ The difference between **methClust** and **CountClust** lies in the model assump
 
 We first apply a special elementary version **methClust** on Bernoulli or presence absence data. The immediate application it targets is ecological presence absence data of species in different sites.
 
-[Grade of Membership model for presence-absence data : A simplification of the methClust model](binClust_model.html)
+[GoM model for binary presence-absence data : Model framework](binClust_model.html)
 
-[Application of methClust on binary presence-absence data: Alex White Birds](ecostructure_fit.html)
+[Simulation test of binary version of methClust with presence-absence data](methclust_grid_presence_absence.html)
 
-[Application of methClust on regional assemblage data: Alex White Birds](methclust_himalayas.html)
+[methClust on binary presence-absence taxonomic data: White et al (2018) Birds](ecostructure_fit.html)
 
-[Grid simulation testing with presence-absence data](methclust_grid_presence_absence.html)
+[methClust on binary regional assemblage data: White et al (2018) Birds](methclust_himalayas.html)
 
-[Original asemblage vs Constructed assemblage from birds presence absence](create_assemblage_presence_absenceRmd.html)
+[Constructing global assemblage fields data from global binary presence absence data on birds : White et al (2018)](create_assemblage_presence_absenceRmd.html)
 
-[Birds->cells versus cells-> birds analysis](birds_cells_versus_cells_birds.html)
+[Binary methClust application on global cells by birds presence absence matrix : White et al (2008)](methClust_global_assemblages.html)
+
+[Binary methClust analysis of *Birds by cells* compared to *Cells by Birds* presence absence data : White et al (2018)](birds_cells_versus_cells_birds.html)
 
 
 ## General methClust applications (methylation examples)

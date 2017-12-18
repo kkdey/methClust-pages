@@ -1,9 +1,11 @@
 ---
-title: "Birds by cells versus cells by birda analysis"
+title: "Birds by cells versus cells by birds analysis"
 author: "Kushal K Dey"
 date: "12/16/2017"
 output: html_document
 ---
+
+We compare the methClust model fit on the sites by bird species presence absence matrix with the bird species by sites presence absence matrix. 
 
 ```{r setup, include=FALSE}
 library(ecostructure)
@@ -13,110 +15,68 @@ library(gtools)
 library(bigalgebra)
 library(sp)
 library(rgdal)
+library(ggplot2)
+library(maps)
+library(ggthemes)
 
 ```
 
 
-```{r, echo=F, message=FALSE, warning=FALSE}
+## Plotting function of clusters
 
-crs <- CRS("+proj=longlat +datum=WGS84")
+```{r}
+latlong <- get(load("../data/LatLongCells_frame.rda"))
+```
 
-myPalette <- colorRampPalette(rev(c("red","lemonchiffon","blue")))
-climate <- getData('worldclim', var='bio', res=10)
+```{r}
+world_map <- map_data("world")
+world_map <- world_map[world_map$region != "Antarctica",] # intercourse antarctica
 
-temperate <- climate$bio6
-tropical <- climate$bio6
+p <- ggplot() + coord_fixed() +
+  xlab("") + ylab("")
 
-temperate[temperate > 0] <- NA
-tropical[tropical < 0] <- NA
+#Add map to base plot
+base_world_messy <- p + geom_map(data=world_map, map = world_map, aes(group=group, map_id=region), colour="white", fill="white", size=0.05, alpha=1/4) 
 
-ocean <- readOGR(dsn = path.expand("../data/ne_110m_ocean/ne_110m_ocean.shp"),
-                 layer ="ne_110m_ocean")
-                 
-coast <- readOGR(dsn = path.expand("../data/ne_110m_coastline/ne_110m_coastline.shp"),
-                 layer ="ne_110m_coastline")
-                 
-myTheme <- rasterTheme(region = myPalette(100))
-levelplot(climate$bio6, 
-          contour=F,
-          margin=F,
-          main=paste("Min Temp Coldest Month (white cells are < -25°C)"),
-          par.settings = myTheme,
-          at=seq(-250, 250, length.out=100),
-          colorkey=list(at=seq(0, 100, 1),
-                        labels=list(at=c(0,25,50,75,100),
-                                    labels=c("-25°C","-12.5°C","0°C","12.5°C", "25°C")))) +
-  latticeExtra::layer(sp.lines(coast, col='black', lwd=0.5))+
-  latticeExtra::layer(sp.polygons(ocean, fill='grey', col='black'))
+cleanup <- 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = 'white', colour = 'white'), 
+        axis.line = element_line(colour = "white"), legend.position="none",
+        axis.ticks=element_blank(), axis.text.x=element_blank(),
+        axis.text.y=element_blank())
 
-
-plot(tropical,col=myPalette(100),main="Min Temp Coldest Month, Above Freezing",zlim=c(-500,500))
-plot(coast, add = T)
-plot(temperate,col=myPalette(100),main="Min Temp Coldest Month, Below Freezing",zlim=c(-500,500))
-plot(coast, add = T)
+base_world <- base_world_messy + cleanup
 
 ```
+
+```{r}
+PlotAssemblageIdx <- function(dat){
+  dat <- cbind.data.frame(latlong, dat)
+colnames(dat) <- c("Latitude", "Longitude", "Value")
+map_data_coloured <- 
+  base_world +
+  geom_point(data=dat, 
+             aes(x=Latitude, y=Longitude, colour=Value), size=0.5) +
+  scale_colour_gradient(low = "white", high = "black") 
+
+map_data_coloured
+}
+
+```
+
 
 ## K = 2 
 
 ### (cells -> birds)
 
-Results for K = 2:
-
-```{r, echo=FALSE}
-####
-######## k2
-#load(file="birds_cluster_2.rda")
+```{r}
 K2_global_topics <- get(load(file="../output/birds_meth_cluster_2.rda"))
 
-topics_theta <- K2_global_topics$omega
-
-proj <- CRS(' +proj=longlat +ellps=WGS84')
-map.extent <- extent(-180,180,-90,90)
-
-newtheme <- rasterTheme(region = colorRampPalette(c("darkseagreen3","orange","red"))( 1000 ))
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,1]
-motif_1_K2 <- matrix(v, nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,2]
-motif_2_K2 <- matrix(v,nrow = 180, ncol = 360)
-
-
-xmin <- -180
-xmax <- 180
-ymin <- -90
-ymax <- 90
-
-motif_K2_maps <- list()
-
-motif_K2_maps[[1]] <- raster(motif_1_K2, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K2_maps[[2]] <- raster(motif_2_K2, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-
-
-
-e <- extent(-180, 180, -60, 90)
-
-motif.K2.theta.maps <- list()
-for (i in 1:length(motif_K2_maps)){
-  motif.K2.theta.maps[[i]] <- levelplot(crop(motif_K2_maps[[i]],e), 
-                                        main=paste("Map cell contributions to Motif ",i, ", K = 2"),
-                                        par.settings=newtheme, 
-                                        contour=F,margin=FALSE,
-                                        colorkey=list(at=seq(0, 100, 1),
-                                                      labels=list(at=c(0,100),
-                                                                  labels=c("Low", "High"))))+
-    latticeExtra::layer(sp.lines(coast, col='black', lwd=0.5))+
-    latticeExtra::layer(sp.polygons(ocean, fill='grey', col='black'))
-}
-
-motif.K2.theta.maps[[1]]
-motif.K2.theta.maps[[2]]
-
-
+topics_omega <- K2_global_topics$omega
+PlotAssemblageIdx(topics_omega[,1])
+PlotAssemblageIdx(topics_omega[,2])
 ```
+
 
 ### (birds -> cells)
 
@@ -131,50 +91,8 @@ K2_global_topics <- get(load(file="../output/birds_meth_cluster_2_reverse.rda"))
 topics_theta_pre <- K2_global_topics$freq
 topics_theta <- apply(topics_theta_pre, 2, function(x) return((x+1e-15)/(max(x)+1e-15)))
 
-proj <- CRS(' +proj=longlat +ellps=WGS84')
-map.extent <- extent(-180,180,-90,90)
-
-newtheme <- rasterTheme(region = colorRampPalette(c("darkseagreen3","orange","red"))( 1000 ))
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,1]
-motif_1_K2 <- matrix(v, nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,2]
-motif_2_K2 <- matrix(v,nrow = 180, ncol = 360)
-
-
-xmin <- -180
-xmax <- 180
-ymin <- -90
-ymax <- 90
-
-motif_K2_maps <- list()
-
-motif_K2_maps[[1]] <- raster(motif_1_K2, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K2_maps[[2]] <- raster(motif_2_K2, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-
-
-
-e <- extent(-180, 180, -60, 90)
-
-motif.K2.theta.maps <- list()
-for (i in 1:length(motif_K2_maps)){
-  motif.K2.theta.maps[[i]] <- levelplot(crop(motif_K2_maps[[i]],e), 
-                                        main=paste("Map cell contributions to Motif ",i, ", K = 2"),
-                                        par.settings=newtheme, 
-                                        contour=F,margin=FALSE,
-                                        colorkey=list(at=seq(0, 100, 1),
-                                                      labels=list(at=c(0,100),
-                                                                  labels=c("Low", "High"))))+
-    latticeExtra::layer(sp.lines(coast, col='black', lwd=0.5))+
-    latticeExtra::layer(sp.polygons(ocean, fill='grey', col='black'))
-}
-
-motif.K2.theta.maps[[1]]
-motif.K2.theta.maps[[2]]
-
+PlotAssemblageIdx(topics_theta[,1])
+PlotAssemblageIdx(topics_theta[,2])
 
 ```
 
@@ -187,65 +105,12 @@ motif.K2.theta.maps[[2]]
 
 ```{r, echo=FALSE}
 
-####
-######## k3
+K3_global_topics <- get(load(file="../output/birds_meth_cluster_3.rda"))
 
-K3_global_topics <- get(load("../output/birds_meth_cluster_3.rda"))
-
-topics_theta <- K3_global_topics$omega
-
-proj <- CRS(' +proj=longlat +ellps=WGS84')
-map.extent <- extent(-180,180,-90,90)
-
-newtheme <- rasterTheme(region = colorRampPalette(c("darkseagreen3","orange","red"))( 1000 ))
-#newtheme <- colorRampPalette(c("darkseagreen3","orange","red"))( 100 )
-
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,1]
-motif_1_K3 <- matrix(v, nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,2]
-motif_2_K3 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,3]
-motif_3_K3 <- matrix(v,nrow = 180, ncol = 360)
-
-
-
-xmin <- -180
-xmax <- 180
-ymin <- -90
-ymax <- 90
-
-motif_K3_maps <- list()
-
-motif_K3_maps[[1]] <- raster(motif_1_K3, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K3_maps[[2]] <- raster(motif_2_K3, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K3_maps[[3]] <- raster(motif_3_K3, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-
-
-e <- extent(-180, 180, -60, 90)
-
-motif.K3.theta.maps <- list()
-for (i in 1:length(motif_K3_maps)){
-  motif.K3.theta.maps[[i]] <- levelplot(crop(motif_K3_maps[[i]],e), 
-                                        main=paste("Map cell contributions to Motif ",i, ", K = 3"),
-                                        par.settings=newtheme, 
-                                        contour=F,margin=FALSE,
-                                        colorkey=list(at=seq(0, 100, 1),
-                                                      labels=list(at=c(0,100),
-                                                                  labels=c("Low", "High"))))+
-    latticeExtra::layer(sp.lines(coast, col='black', lwd=0.5))+
-    latticeExtra::layer(sp.polygons(ocean, fill='grey', col='black'))
-}
-
-motif.K3.theta.maps[[1]]
-motif.K3.theta.maps[[2]]
-motif.K3.theta.maps[[3]]
-
+topics_omega <- K3_global_topics$omega
+PlotAssemblageIdx(topics_omega[,1])
+PlotAssemblageIdx(topics_omega[,2])
+PlotAssemblageIdx(topics_omega[,3])
 
 ```
 
@@ -255,64 +120,14 @@ Results for K = 3:
 
 ```{r, echo=FALSE}
 
-####
-######## k3
+K3_global_topics <- get(load(file="../output/birds_meth_cluster_3_reverse.rda"))
 
-K3_global_topics <- get(load("../output/birds_meth_cluster_3_reverse.rda"))
+topics_theta_pre <- K3_global_topics$freq
+topics_theta <- apply(topics_theta_pre, 2, function(x) return((x+1e-15)/(max(x)+1e-15)))
 
-topics_theta <- K3_global_topics$freq
-
-proj <- CRS(' +proj=longlat +ellps=WGS84')
-map.extent <- extent(-180,180,-90,90)
-
-newtheme <- rasterTheme(region = colorRampPalette(c("darkseagreen3","orange","red"))( 1000 ))
-#newtheme <- colorRampPalette(c("darkseagreen3","orange","red"))( 100 )
-
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,1]
-motif_1_K3 <- matrix(v, nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,2]
-motif_2_K3 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,3]
-motif_3_K3 <- matrix(v,nrow = 180, ncol = 360)
-
-
-
-xmin <- -180
-xmax <- 180
-ymin <- -90
-ymax <- 90
-
-motif_K3_maps <- list()
-
-motif_K3_maps[[1]] <- raster(motif_1_K3, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K3_maps[[2]] <- raster(motif_2_K3, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K3_maps[[3]] <- raster(motif_3_K3, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-
-
-e <- extent(-180, 180, -60, 90)
-
-motif.K3.theta.maps <- list()
-for (i in 1:length(motif_K3_maps)){
-  motif.K3.theta.maps[[i]] <- levelplot(crop(motif_K3_maps[[i]],e), 
-                                        main=paste("Map cell contributions to Motif ",i, ", K = 3"),
-                                        par.settings=newtheme, 
-                                        contour=F,margin=FALSE,
-                                        colorkey=list(at=seq(0, 100, 1),
-                                                      labels=list(at=c(0,100),
-                                                                  labels=c("Low", "High"))))+
-    latticeExtra::layer(sp.lines(coast, col='black', lwd=0.5))+
-    latticeExtra::layer(sp.polygons(ocean, fill='grey', col='black'))
-}
-
-motif.K3.theta.maps[[1]]
-motif.K3.theta.maps[[2]]
-motif.K3.theta.maps[[3]]
+PlotAssemblageIdx(topics_theta_pre[,1])
+PlotAssemblageIdx(topics_theta_pre[,2])
+PlotAssemblageIdx(topics_theta_pre[,3])
 
 
 ```
@@ -326,75 +141,16 @@ motif.K3.theta.maps[[3]]
 
 K5_global_topics <- get(load(file="../output/birds_meth_cluster_5.rda"))
 
-topics_theta_pre <- K5_global_topics$omega
-topics_theta <- apply(topics_theta_pre, 2, function(x) return((x+1e-15)/(max(x)+1e-15)))
-
-
-proj <- CRS(' +proj=longlat +ellps=WGS84')
-map.extent <- extent(-180,180,-90,90)
-
-newtheme <- rasterTheme(region = colorRampPalette(c("darkseagreen3","orange","red"))( 1000 ))
-#newtheme <- colorRampPalette(c("darkseagreen3","orange","red"))( 100 )
-
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,1]
-motif_1_K5 <- matrix(v, nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,2]
-motif_2_K5 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,3]
-motif_3_K5 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,4]
-motif_4_K5 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,5]
-motif_5_K5 <- matrix(v,nrow = 180, ncol = 360)
-
-xmin <- -180
-xmax <- 180
-ymin <- -90
-ymax <- 90
-
-motif_K5_maps <- list()
-
-motif_K5_maps[[1]] <- raster(motif_1_K5, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K5_maps[[2]] <- raster(motif_2_K5, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K5_maps[[3]] <- raster(motif_3_K5, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K5_maps[[4]] <- raster(motif_4_K5, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K5_maps[[5]] <- raster(motif_5_K5, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-
-e <- extent(-180, 180, -60, 90)
-
-motif.K5.theta.maps <- list()
-for (i in 1:length(motif_K5_maps)){
-  motif.K5.theta.maps[[i]] <- levelplot(crop(motif_K5_maps[[i]],e), 
-                                        main=paste("Map cell contributions to Motif ",i, ", K = 5"),
-                                        par.settings=newtheme, 
-                                        contour=F,margin=FALSE,
-                                        colorkey=list(at=seq(0, 100, 1),
-                                                      labels=list(at=c(0,100),
-                                                                  labels=c("Low", "High"))))+
-    latticeExtra::layer(sp.lines(coast, col='black', lwd=0.5))+
-    latticeExtra::layer(sp.polygons(ocean, fill='grey', col='black'))
-}
-
-motif.K5.theta.maps[[1]]
-motif.K5.theta.maps[[2]]
-motif.K5.theta.maps[[3]]
-motif.K5.theta.maps[[4]]
-motif.K5.theta.maps[[5]]
+topics_omega <- K5_global_topics$omega
+PlotAssemblageIdx(topics_omega[,1])
+PlotAssemblageIdx(topics_omega[,2])
+PlotAssemblageIdx(topics_omega[,3])
+PlotAssemblageIdx(topics_omega[,4])
+PlotAssemblageIdx(topics_omega[,5])
 
 ```
 
 ### (birds -> cells)
-
 
 Results for K = 5:
 
@@ -405,67 +161,12 @@ K5_global_topics <- get(load(file="../output/birds_meth_cluster_5_reverse.rda"))
 topics_theta_pre <- K5_global_topics$freq
 topics_theta <- apply(topics_theta_pre, 2, function(x) return((x+1e-15)/(max(x)+1e-15)))
 
+PlotAssemblageIdx(topics_theta_pre[,1])
+PlotAssemblageIdx(topics_theta_pre[,2])
+PlotAssemblageIdx(topics_theta_pre[,3])
+PlotAssemblageIdx(topics_theta_pre[,4])
+PlotAssemblageIdx(topics_theta_pre[,5])
 
-proj <- CRS(' +proj=longlat +ellps=WGS84')
-map.extent <- extent(-180,180,-90,90)
-
-newtheme <- rasterTheme(region = colorRampPalette(c("darkseagreen3","orange","red"))( 1000 ))
-#newtheme <- colorRampPalette(c("darkseagreen3","orange","red"))( 100 )
-
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,1]
-motif_1_K5 <- matrix(v, nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,2]
-motif_2_K5 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,3]
-motif_3_K5 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,4]
-motif_4_K5 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,5]
-motif_5_K5 <- matrix(v,nrow = 180, ncol = 360)
-
-xmin <- -180
-xmax <- 180
-ymin <- -90
-ymax <- 90
-
-motif_K5_maps <- list()
-
-motif_K5_maps[[1]] <- raster(motif_1_K5, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K5_maps[[2]] <- raster(motif_2_K5, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K5_maps[[3]] <- raster(motif_3_K5, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K5_maps[[4]] <- raster(motif_4_K5, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K5_maps[[5]] <- raster(motif_5_K5, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-
-e <- extent(-180, 180, -60, 90)
-
-motif.K5.theta.maps <- list()
-for (i in 1:length(motif_K5_maps)){
-  motif.K5.theta.maps[[i]] <- levelplot(crop(motif_K5_maps[[i]],e), 
-                                        main=paste("Map cell contributions to Motif ",i, ", K = 5"),
-                                        par.settings=newtheme, 
-                                        contour=F,margin=FALSE,
-                                        colorkey=list(at=seq(0, 100, 1),
-                                                      labels=list(at=c(0,100),
-                                                                  labels=c("Low", "High"))))+
-    latticeExtra::layer(sp.lines(coast, col='black', lwd=0.5))+
-    latticeExtra::layer(sp.polygons(ocean, fill='grey', col='black'))
-}
-
-motif.K5.theta.maps[[1]]
-motif.K5.theta.maps[[2]]
-motif.K5.theta.maps[[3]]
-motif.K5.theta.maps[[4]]
-motif.K5.theta.maps[[5]]
 
 ```
 
@@ -475,209 +176,88 @@ motif.K5.theta.maps[[5]]
 
 ```{r, echo=FALSE}
 
-######## k10
 K10_global_topics <- get(load(file="../output/birds_meth_cluster_10.rda"))
 
-topics_theta <- K10_global_topics$omega
-
-proj <- CRS(' +proj=longlat +ellps=WGS84')
-map.extent <- extent(-180,180,-90,90)
-
-newtheme <- rasterTheme(region = colorRampPalette(c("darkseagreen3","orange","red"))( 1000 ))
-#newtheme <- colorRampPalette(c("darkseagreen3","orange","red"))( 100 )
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,1]
-motif_1_K10 <- matrix(v, nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,2]
-motif_2_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,3]
-motif_3_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,4]
-motif_4_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,5]
-motif_5_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,6]
-motif_6_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,7]
-motif_7_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,8]
-motif_8_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,9]
-motif_9_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,10]
-motif_10_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-
-xmin <- -180
-xmax <- 180
-ymin <- -90
-ymax <- 90
-
-motif_K10_maps <- list()
-
-motif_K10_maps[[1]] <- raster(motif_1_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[2]] <- raster(motif_2_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[3]] <- raster(motif_3_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[4]] <- raster(motif_4_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[5]] <- raster(motif_5_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[6]] <- raster(motif_6_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[7]] <- raster(motif_7_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[8]] <- raster(motif_8_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[9]] <- raster(motif_9_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[10]] <- raster(motif_10_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-
-
-e <- extent(-180, 180, -60, 90)
-
-motif.K10.theta.maps <- list()
-for (i in 1:length(motif_K10_maps)){
-  motif.K10.theta.maps[[i]] <- levelplot(crop(motif_K10_maps[[i]],e),
-                                        main=paste("Map cell contributions to Motif ",i, ", K = 10"),
-                                        par.settings=newtheme, 
-                                        contour=F,margin=F,
-                                        colorkey=list(at=seq(0, 100, 1),
-                                                      labels=list(at=c(0,100),
-                                                                  labels=c("Low", "High"))))+
-    latticeExtra::layer(sp.lines(coast, col='black', lwd=0.5))+
-    latticeExtra::layer(sp.polygons(ocean, fill='grey', col='black'))
-}
-
-motif.K10.theta.maps[[1]]
-motif.K10.theta.maps[[2]]
-motif.K10.theta.maps[[3]]
-motif.K10.theta.maps[[4]]
-motif.K10.theta.maps[[5]]
-motif.K10.theta.maps[[6]]
-motif.K10.theta.maps[[7]]
-motif.K10.theta.maps[[8]]
-motif.K10.theta.maps[[9]]
-motif.K10.theta.maps[[10]]
-
+topics_omega <- K10_global_topics$omega
+PlotAssemblageIdx(topics_omega[,1])
+PlotAssemblageIdx(topics_omega[,2])
+PlotAssemblageIdx(topics_omega[,3])
+PlotAssemblageIdx(topics_omega[,4])
+PlotAssemblageIdx(topics_omega[,5])
+PlotAssemblageIdx(topics_omega[,6])
+PlotAssemblageIdx(topics_omega[,7])
+PlotAssemblageIdx(topics_omega[,8])
+PlotAssemblageIdx(topics_omega[,9])
+PlotAssemblageIdx(topics_omega[,10])
 ```
 
 ### (birds -> cells)
-
 
 Results for K = 10:
 
 ```{r, echo=FALSE}
 
-######## k10
 K10_global_topics <- get(load(file="../output/birds_meth_cluster_10_reverse.rda"))
 
 topics_theta_pre <- K10_global_topics$freq
 topics_theta <- apply(topics_theta_pre, 2, function(x) return((x+1e-15)/(max(x)+1e-15)))
 
-
-proj <- CRS(' +proj=longlat +ellps=WGS84')
-map.extent <- extent(-180,180,-90,90)
-
-newtheme <- rasterTheme(region = colorRampPalette(c("darkseagreen3","orange","red"))( 1000 ))
-#newtheme <- colorRampPalette(c("darkseagreen3","orange","red"))( 100 )
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,1]
-motif_1_K10 <- matrix(v, nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,2]
-motif_2_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,3]
-motif_3_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,4]
-motif_4_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,5]
-motif_5_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,6]
-motif_6_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,7]
-motif_7_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,8]
-motif_8_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,9]
-motif_9_K10 <- matrix(v,nrow = 180, ncol = 360)
-
-v <- rep(0,64800)
-v[as.numeric(rownames(topics_theta))] = topics_theta[,10]
-motif_10_K10 <- matrix(v,nrow = 180, ncol = 360)
+PlotAssemblageIdx(topics_theta_pre[,1])
+PlotAssemblageIdx(topics_theta_pre[,2])
+PlotAssemblageIdx(topics_theta_pre[,3])
+PlotAssemblageIdx(topics_theta_pre[,4])
+PlotAssemblageIdx(topics_theta_pre[,5])
+PlotAssemblageIdx(topics_theta_pre[,6])
+PlotAssemblageIdx(topics_theta_pre[,7])
+PlotAssemblageIdx(topics_theta_pre[,8])
+PlotAssemblageIdx(topics_theta_pre[,9])
+PlotAssemblageIdx(topics_theta_pre[,10])
 
 
-xmin <- -180
-xmax <- 180
-ymin <- -90
-ymax <- 90
+```
 
-motif_K10_maps <- list()
+## K = 11
 
-motif_K10_maps[[1]] <- raster(motif_1_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[2]] <- raster(motif_2_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[3]] <- raster(motif_3_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[4]] <- raster(motif_4_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[5]] <- raster(motif_5_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[6]] <- raster(motif_6_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[7]] <- raster(motif_7_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[8]] <- raster(motif_8_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[9]] <- raster(motif_9_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
-motif_K10_maps[[10]] <- raster(motif_10_K10, xmn=xmin, xmx=xmax, ymn=ymin, ymx=ymax)
+### (cells -> birds)
 
+```{r, echo=FALSE}
 
-e <- extent(-180, 180, -60, 90)
+K11_global_topics <- get(load(file="../output/birds_meth_cluster_11.rda"))
 
-motif.K10.theta.maps <- list()
-for (i in 1:length(motif_K10_maps)){
-  motif.K10.theta.maps[[i]] <- levelplot(crop(motif_K10_maps[[i]],e),
-                                        main=paste("Map cell contributions to Motif ",i, ", K = 10"),
-                                        par.settings=newtheme, 
-                                        contour=F,margin=F,
-                                        colorkey=list(at=seq(0, 100, 1),
-                                                      labels=list(at=c(0,100),
-                                                                  labels=c("Low", "High"))))+
-    latticeExtra::layer(sp.lines(coast, col='black', lwd=0.5))+
-    latticeExtra::layer(sp.polygons(ocean, fill='grey', col='black'))
-}
+topics_omega <- K11_global_topics$omega
+PlotAssemblageIdx(topics_omega[,1])
+PlotAssemblageIdx(topics_omega[,2])
+PlotAssemblageIdx(topics_omega[,3])
+PlotAssemblageIdx(topics_omega[,4])
+PlotAssemblageIdx(topics_omega[,5])
+PlotAssemblageIdx(topics_omega[,6])
+PlotAssemblageIdx(topics_omega[,7])
+PlotAssemblageIdx(topics_omega[,8])
+PlotAssemblageIdx(topics_omega[,9])
+PlotAssemblageIdx(topics_omega[,10])
+PlotAssemblageIdx(topics_omega[,11])
 
-motif.K10.theta.maps[[1]]
-motif.K10.theta.maps[[2]]
-motif.K10.theta.maps[[3]]
-motif.K10.theta.maps[[4]]
-motif.K10.theta.maps[[5]]
-motif.K10.theta.maps[[6]]
-motif.K10.theta.maps[[7]]
-motif.K10.theta.maps[[8]]
-motif.K10.theta.maps[[9]]
-motif.K10.theta.maps[[10]]
+```
+
+### (birds -> cells)
+
+```{r, echo=FALSE}
+
+K11_global_topics <- get(load(file="../output/birds_meth_cluster_11_reverse.rda"))
+
+topics_theta_pre <- K11_global_topics$freq
+topics_theta <- apply(topics_theta_pre, 2, function(x) return((x+1e-15)/(max(x)+1e-15)))
+
+PlotAssemblageIdx(topics_theta_pre[,1])
+PlotAssemblageIdx(topics_theta_pre[,2])
+PlotAssemblageIdx(topics_theta_pre[,3])
+PlotAssemblageIdx(topics_theta_pre[,4])
+PlotAssemblageIdx(topics_theta_pre[,5])
+PlotAssemblageIdx(topics_theta_pre[,6])
+PlotAssemblageIdx(topics_theta_pre[,7])
+PlotAssemblageIdx(topics_theta_pre[,8])
+PlotAssemblageIdx(topics_theta_pre[,9])
+PlotAssemblageIdx(topics_theta_pre[,10])
+PlotAssemblageIdx(topics_theta_pre[,11])
 
 ```

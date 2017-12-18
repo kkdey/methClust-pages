@@ -1,0 +1,144 @@
+---
+title: 'methClust on global assemblages: different Ks'
+author: "Kushal K Dey"
+date: "12/18/2017"
+output: html_document
+---
+
+We perform **methClust** on the global binary presence absence data of around 9500 bird species across approx 17,500 cells.
+
+```{r setup, include=FALSE}
+library(ecostructure)
+library(Biobase)
+library(rasterVis)
+library(gtools)
+library(bigalgebra)
+library(sp)
+library(rgdal)
+library(ggplot2)
+library(maps)
+library(ggthemes)
+
+```
+
+## Plotting function of clusters
+
+```{r}
+latlong <- get(load("../data/LatLongCells_frame.rda"))
+```
+
+```{r}
+world_map <- map_data("world")
+world_map <- world_map[world_map$region != "Antarctica",] # intercourse antarctica
+
+p <- ggplot() + coord_fixed() +
+  xlab("") + ylab("")
+
+#Add map to base plot
+base_world_messy <- p + geom_map(data=world_map, map = world_map, aes(group=group, map_id=region), colour="white", fill="white", size=0.05, alpha=1/4) 
+
+cleanup <- 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = 'white', colour = 'white'), 
+        axis.line = element_line(colour = "white"), legend.position="none",
+        axis.ticks=element_blank(), axis.text.x=element_blank(),
+        axis.text.y=element_blank())
+
+base_world <- base_world_messy + cleanup
+
+```
+
+```{r}
+PlotAssemblageIdx <- function(dat){
+  dat <- cbind.data.frame(latlong, dat)
+colnames(dat) <- c("Latitude", "Longitude", "Value")
+map_data_coloured <- 
+  base_world +
+  geom_point(data=dat, 
+             aes(x=Latitude, y=Longitude, colour=Value), size=0.5) +
+  scale_colour_gradient(low = "white", high = "black") 
+
+map_data_coloured
+}
+
+```
+
+
+## K = 2 
+
+```{r}
+K2_global_topics <- get(load(file="../output/birds_meth_cluster_2.rda"))
+
+topics_omega <- K2_global_topics$omega
+PlotAssemblageIdx(topics_omega[,1])
+PlotAssemblageIdx(topics_omega[,2])
+```
+
+## K = 3 
+
+```{r, echo=FALSE}
+
+K3_global_topics <- get(load(file="../output/birds_meth_cluster_3.rda"))
+
+topics_omega <- K3_global_topics$omega
+PlotAssemblageIdx(topics_omega[,1])
+PlotAssemblageIdx(topics_omega[,2])
+PlotAssemblageIdx(topics_omega[,3])
+
+```
+
+## K = 5
+
+```{r, echo=FALSE}
+
+K5_global_topics <- get(load(file="../output/birds_meth_cluster_5.rda"))
+
+topics_omega <- K5_global_topics$omega
+PlotAssemblageIdx(topics_omega[,1])
+PlotAssemblageIdx(topics_omega[,2])
+PlotAssemblageIdx(topics_omega[,3])
+PlotAssemblageIdx(topics_omega[,4])
+PlotAssemblageIdx(topics_omega[,5])
+
+```
+
+## K = 10
+
+```{r, echo=FALSE}
+
+K10_global_topics <- get(load(file="../output/birds_meth_cluster_10.rda"))
+
+topics_omega <- K10_global_topics$omega
+PlotAssemblageIdx(topics_omega[,1])
+PlotAssemblageIdx(topics_omega[,2])
+PlotAssemblageIdx(topics_omega[,3])
+PlotAssemblageIdx(topics_omega[,4])
+PlotAssemblageIdx(topics_omega[,5])
+PlotAssemblageIdx(topics_omega[,6])
+PlotAssemblageIdx(topics_omega[,7])
+PlotAssemblageIdx(topics_omega[,8])
+PlotAssemblageIdx(topics_omega[,9])
+PlotAssemblageIdx(topics_omega[,10])
+```
+
+## K = 11
+
+```{r, echo=FALSE}
+
+K11_global_topics <- get(load(file="../output/birds_meth_cluster_11.rda"))
+
+topics_omega <- K11_global_topics$omega
+PlotAssemblageIdx(topics_omega[,1])
+PlotAssemblageIdx(topics_omega[,2])
+PlotAssemblageIdx(topics_omega[,3])
+PlotAssemblageIdx(topics_omega[,4])
+PlotAssemblageIdx(topics_omega[,5])
+PlotAssemblageIdx(topics_omega[,6])
+PlotAssemblageIdx(topics_omega[,7])
+PlotAssemblageIdx(topics_omega[,8])
+PlotAssemblageIdx(topics_omega[,9])
+PlotAssemblageIdx(topics_omega[,10])
+PlotAssemblageIdx(topics_omega[,11])
+
+```
+
