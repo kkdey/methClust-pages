@@ -18,6 +18,9 @@ library(sp)
 library(rgdal)
 library(ggplot2)
 library(maps)
+library(mapdata)
+library(mapplots)
+library(scales)
 library(ggthemes)
 
 ```
@@ -142,4 +145,20 @@ PlotAssemblageIdx2(topics$omega[,2])
 ```
 
 You can see that both clusters have partial grades of membership along the Wallace line (points shaded grey). But one cluster is mainly driven by bird species to the north of the Wallace Line  while the other cluster driven by bird species to the south of Wallace Line. 
+
+## geo Structure plot representation
+
+```{r, message = FALSE, warning = FALSE}
+png(filename="../output/geostructure_birds.png",width = 1000, height = 800)
+map("worldHires",
+    ylim=c(-10,10), xlim=c(100,150), # Re-defines the latitude and longitude range
+    col = "gray", fill=TRUE, mar=c(0.1,0.1,0.1,0.1))
+lapply(1:dim(topics$omega)[1], function(r) 
+  add.pie(z=as.integer(100*topics$omega[r,]), 
+          x=latlong2[r,1], y=latlong2[r,2], labels=c("","",""),
+          radius = 0.5,
+          col=c(alpha(2,0.6),alpha(3,0.6))));
+dev.off()
+```
+
 
