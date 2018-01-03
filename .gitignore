@@ -9,3 +9,5 @@ analysis/*html
 analysis/*_cache
 output/
 data/
+talks/report.key
+talks/report.pdf
