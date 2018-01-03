@@ -142,3 +142,28 @@ PlotAssemblageIdx(topics_omega[,11])
 
 ```
 
+
+## K = 15
+
+```{r, echo=FALSE}
+
+K15_global_topics <- get(load(file="../output/birds_meth_cluster_15.rda"))
+
+topics_omega <- K15_global_topics$omega
+PlotAssemblageIdx(topics_omega[,1])
+PlotAssemblageIdx(topics_omega[,2])
+PlotAssemblageIdx(topics_omega[,3])
+PlotAssemblageIdx(topics_omega[,4])
+PlotAssemblageIdx(topics_omega[,5])
+PlotAssemblageIdx(topics_omega[,6])
+PlotAssemblageIdx(topics_omega[,7])
+PlotAssemblageIdx(topics_omega[,8])
+PlotAssemblageIdx(topics_omega[,9])
+PlotAssemblageIdx(topics_omega[,10])
+PlotAssemblageIdx(topics_omega[,11])
+PlotAssemblageIdx(topics_omega[,12])
+PlotAssemblageIdx(topics_omega[,13])
+PlotAssemblageIdx(topics_omega[,14])
+PlotAssemblageIdx(topics_omega[,15])
+
+```

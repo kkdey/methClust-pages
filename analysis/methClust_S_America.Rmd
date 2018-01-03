@@ -1,0 +1,116 @@
+---
+title: "methClust in South America"
+author: "Kushal K Dey"
+date: "12/20/2017"
+output: html_document
+---
+
+We run **methClust** on the birds presence absence data in the continent of South America.
+
+```{r setup, include=FALSE}
+library(ecostructure)
+library(methClust)
+library(Biobase)
+library(rasterVis)
+library(gtools)
+library(bigalgebra)
+library(sp)
+library(rgdal)
+library(ggplot2)
+library(maps)
+library(mapdata)
+library(mapplots)
+library(scales)
+library(ggthemes)
+
+```
+
+## Plotting Maps Function
+
+```{r}
+latlong <- get(load("../data/LatLongCells_frame.rda"))
+```
+
+```{r}
+world_map <- map_data("world")
+world_map <- world_map[world_map$region != "Antarctica",] # intercourse antarctica
+
+world_map <- world_map[world_map$long > -80 & world_map$long < -30, ]
+world_map <- world_map[world_map$lat > -60 & world_map$lat < 15, ]
+
+
+p <- ggplot() + coord_fixed() +
+  xlab("") + ylab("")
+
+#Add map to base plot
+base_world_messy <- p + geom_polygon(data=world_map, aes(x=long, y=lat, group=group), colour="light green", fill="light green")
+
+cleanup <- 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = 'white', colour = 'white'), 
+        axis.line = element_line(colour = "white"), legend.position="none",
+        axis.ticks=element_blank(), axis.text.x=element_blank(),
+        axis.text.y=element_blank())
+
+base_world <- base_world_messy + cleanup
+
+base_world
+
+```
+
+
+## Extracting Indian birds presence absence data
+
+```{r}
+latlong <- get(load("../data/LatLongCells_frame.rda"))
+```
+
+```{r}
+idx1 <- which(latlong[,2] > -60 & latlong[,2] < 15)
+idx2 <- which(latlong[,1] > -80 & latlong[,1] < -30)
+idx <- intersect(idx1, idx2)
+length(idx)
+latlong2 <- latlong[idx,]
+```
+
+```{r}
+birds_pa_data <- readRDS("../data/birds_presab_land_breeding_counts.rds")
+birds_pa_data_2 <- birds_pa_data[idx, ]
+birds_pa_data_3 <- birds_pa_data_2[, which(colSums(birds_pa_data_2) != 0)]
+```
+
+```{r}
+PlotAssemblageIdx <- function(idx){
+  dat <- cbind.data.frame(latlong2, birds_pa_data_3[,idx])
+colnames(dat) <- c("Latitude", "Longitude", "Value")
+map_data_coloured <- 
+  base_world +
+  geom_point(data=dat, 
+             aes(x=Latitude, y=Longitude, colour=Value), size=0.5) +
+  scale_colour_gradient(low = "white", high = "black") 
+
+map_data_coloured
+}
+
+```
+
+## Example presence-absence data of bird species 
+
+```{r}
+par(mfrow = c(3,2))
+PlotAssemblageIdx(1)
+PlotAssemblageIdx(10)
+PlotAssemblageIdx(100)
+PlotAssemblageIdx(500)
+PlotAssemblageIdx(700)
+```
+
+## Application of methClust and visualization
+
+We apply **methClust** on the presence-absence data of relevant bird species in India.
+
+```{r echo=TRUE, eval = FALSE}
+topics <- meth_topics(birds_pa_data_3, 1 - birds_pa_data_3, 
+            K=10, tol = 10, use_squarem = FALSE)
+save(topics, file = "../output/S_America/methClust_10.rda")
+```

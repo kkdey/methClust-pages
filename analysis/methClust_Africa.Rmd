@@ -1,0 +1,222 @@
+---
+title: "methClust in Africa"
+author: "Kushal K Dey"
+date: "12/20/2017"
+output: html_document
+---
+
+We run **methClust** on the birds presence absence data in the African continent.
+
+```{r setup, include=FALSE}
+library(ecostructure)
+library(methClust)
+library(Biobase)
+library(rasterVis)
+library(gtools)
+library(bigalgebra)
+library(sp)
+library(rgdal)
+library(ggplot2)
+library(maps)
+library(mapdata)
+library(mapplots)
+library(scales)
+library(ggthemes)
+
+```
+
+## Plotting Maps Function
+
+```{r}
+latlong <- get(load("../data/LatLongCells_frame.rda"))
+```
+
+```{r}
+world_map <- map_data("world")
+world_map <- world_map[world_map$region != "Antarctica",] # intercourse antarctica
+
+world_map <- world_map[world_map$long > -18 & world_map$long < 52, ]
+world_map <- world_map[world_map$lat > -50 & world_map$lat < 35, ]
+
+
+p <- ggplot() + coord_fixed() +
+  xlab("") + ylab("")
+
+#Add map to base plot
+base_world_messy <- p + geom_polygon(data=world_map, aes(x=long, y=lat, group=group), colour="light green", fill="light green")
+
+cleanup <- 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = 'white', colour = 'white'), 
+        axis.line = element_line(colour = "white"), legend.position="none",
+        axis.ticks=element_blank(), axis.text.x=element_blank(),
+        axis.text.y=element_blank())
+
+base_world <- base_world_messy + cleanup
+
+base_world
+
+```
+
+## Extracting Africa presence absence data
+
+```{r}
+latlong <- get(load("../data/LatLongCells_frame.rda"))
+```
+
+```{r}
+idx1 <- which(latlong[,2] > -50 & latlong[,2] < 35)
+idx2 <- which(latlong[,1] > -18 & latlong[,1] < 52)
+idx <- intersect(idx1, idx2)
+length(idx)
+latlong2 <- latlong[idx,]
+```
+
+
+```{r}
+birds_pa_data <- readRDS("../data/birds_presab_land_breeding_counts.rds")
+birds_pa_data_2 <- birds_pa_data[idx, ]
+birds_pa_data_3 <- birds_pa_data_2[, which(colSums(birds_pa_data_2)!=0)]
+```
+
+```{r}
+PlotAssemblageIdx <- function(idx){
+  dat <- cbind.data.frame(latlong2, birds_pa_data_3[,idx])
+colnames(dat) <- c("Latitude", "Longitude", "Value")
+map_data_coloured <- 
+  base_world +
+  geom_point(data=dat, 
+             aes(x=Latitude, y=Longitude, colour=Value), size=0.5) +
+  scale_colour_gradient(low = "white", high = "black") 
+
+map_data_coloured
+}
+
+```
+
+## Example presence-absence data of bird species 
+
+```{r}
+par(mfrow = c(6,2))
+PlotAssemblageIdx(1)
+PlotAssemblageIdx(28)
+PlotAssemblageIdx(100)
+PlotAssemblageIdx(546)
+PlotAssemblageIdx(176)
+PlotAssemblageIdx(50)
+PlotAssemblageIdx(24)
+PlotAssemblageIdx(1200)
+PlotAssemblageIdx(1300)
+PlotAssemblageIdx(1400)
+PlotAssemblageIdx(1500)
+PlotAssemblageIdx(1600)
+```
+
+## Application of methClust and visualization
+
+We apply **methClust** on the presence-absence data of relevant bird species along the Wallace Line.
+
+```{r echo=TRUE, eval = FALSE}
+topics <- meth_topics(birds_pa_data_3, 1 - birds_pa_data_3, 
+            K=10, tol = 10, use_squarem = FALSE)
+save(topics, file = "../output/Africa/methClust_10.rda")
+```
+
+
+```{r}
+PlotAssemblageIdx2 <- function(dat){
+  dat <- cbind.data.frame(latlong2, dat)
+colnames(dat) <- c("Latitude", "Longitude", "Value")
+map_data_coloured <- 
+  base_world +
+  geom_point(data=dat, 
+             aes(x=Latitude, y=Longitude, colour=Value), size=0.5) +
+  scale_colour_gradient(low = "white", high = "black") 
+
+map_data_coloured
+}
+
+```
+
+## geo Structure plot representation
+
+### K = 2
+
+```{r}
+topics <- get(load("../output/Africa/methClust_2.rda"))
+```
+
+```{r, message = FALSE, warning = FALSE}
+
+png(filename="../output/Africa/geostructure_birds_2.png",width = 1000, height = 800)
+map("worldHires",
+    ylim=c(-50,35), xlim=c(-18,52), # Re-defines the latitude and longitude range
+    col = "gray", fill=TRUE, mar=c(0.1,0.1,0.1,0.1))
+lapply(1:dim(topics$omega)[1], function(r) 
+  add.pie(z=as.integer(100*topics$omega[r,]), 
+          x=latlong2[r,1], y=latlong2[r,2], labels=c("","",""),
+          radius = 0.5,
+          col=c(alpha(2,0.6),alpha(3,0.6))));
+dev.off()
+```
+
+
+### K = 3
+
+```{r}
+topics <- get(load("../output/Africa/methClust_3.rda"))
+```
+
+```{r, message = FALSE, warning = FALSE}
+
+png(filename="../output/Africa/geostructure_birds_3.png",width = 1000, height = 800)
+map("worldHires",
+    ylim=c(-50,35), xlim=c(-18,52), # Re-defines the latitude and longitude range
+    col = "gray", fill=TRUE, mar=c(0.1,0.1,0.1,0.1))
+lapply(1:dim(topics$omega)[1], function(r) 
+  add.pie(z=as.integer(100*topics$omega[r,]), 
+          x=latlong2[r,1], y=latlong2[r,2], labels=c("","",""),
+          radius = 0.5,
+          col=c(alpha(2,0.6),alpha(3,0.6), alpha(4,0.6))));
+dev.off()
+```
+
+### K = 4
+
+```{r}
+topics <- get(load("../output/Africa/methClust_4.rda"))
+```
+
+```{r, message = FALSE, warning = FALSE}
+
+png(filename="../output/Africa/geostructure_birds_4.png",width = 1000, height = 800)
+map("worldHires",
+    ylim=c(-50,35), xlim=c(-18,52), # Re-defines the latitude and longitude range
+    col = "gray", fill=TRUE, mar=c(0.1,0.1,0.1,0.1))
+lapply(1:dim(topics$omega)[1], function(r) 
+  add.pie(z=as.integer(100*topics$omega[r,]), 
+          x=latlong2[r,1], y=latlong2[r,2], labels=c("","",""),
+          radius = 0.5,
+          col=c(alpha(2,0.6),alpha(3,0.6), alpha(4,0.6), alpha(5,0.6))));
+dev.off()
+```
+
+### K = 5
+
+```{r}
+topics <- get(load("../output/Africa/methClust_5.rda"))
+```
+
+```{r, message = FALSE, warning = FALSE}
+
+png(filename="../output/Africa/geostructure_birds_5.png",width = 1000, height = 800)
+map("worldHires",
+    ylim=c(-50,35), xlim=c(-18,52), # Re-defines the latitude and longitude range
+    col = "gray", fill=TRUE, mar=c(0.1,0.1,0.1,0.1))
+lapply(1:dim(topics$omega)[1], function(r) 
+  add.pie(z=as.integer(100*topics$omega[r,]), 
+          x=latlong2[r,1], y=latlong2[r,2], labels=c("","",""),
+          radius = 0.5,
+          col=c(alpha(2,0.6),alpha(3,0.6), alpha(4,0.6), alpha(5,0.6), alpha(6,0.6))));
+dev.off()
+```

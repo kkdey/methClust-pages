@@ -16,6 +16,7 @@ library(CountClust)
 library(ggplot2)
 library(Seurat)
 library(Rtsne)
+library(mapplots)
 ```
 
 Load the methylation and non-methylation counts data
@@ -63,6 +64,9 @@ topic_clus[[4]] <- get(load("../output/methclust_hch_k_5.rda"))
 topic_clus[[5]] <- get(load("../output/methclust_hch_k_6.rda"))
 
 ```
+
+
+
 
 ## t-SNE projections + Hard clustering from methClust
 

@@ -1,0 +1,221 @@
+---
+title: 'GoM on Australia : Driving Birds'
+author: "Kushal K Dey"
+date: "1/2/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ecostructure)
+library(methClust)
+library(Biobase)
+library(rasterVis)
+library(gtools)
+library(bigalgebra)
+library(sp)
+library(rgdal)
+library(ggplot2)
+library(maps)
+library(mapdata)
+library(mapplots)
+library(scales)
+library(ggthemes)
+
+```
+
+
+## Data Processing + Extracting driving bird species 
+
+```{r}
+latlong <- get(load("../data/LatLongCells_frame.rda"))
+```
+
+```{r}
+world_map <- map_data("world")
+world_map <- world_map[world_map$region != "Antarctica",] # intercourse antarctica
+
+world_map <- world_map[world_map$long > 110 & world_map$long < 160, ]
+world_map <- world_map[world_map$lat > -50 & world_map$lat < -10, ]
+
+
+p <- ggplot() + coord_fixed() +
+  xlab("") + ylab("")
+
+#Add map to base plot
+base_world_messy <- p + geom_polygon(data=world_map, aes(x=long, y=lat, group=group), colour="light green", fill="light green")
+
+cleanup <- 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = 'white', colour = 'white'), 
+        axis.line = element_line(colour = "white"), legend.position="none",
+        axis.ticks=element_blank(), axis.text.x=element_blank(),
+        axis.text.y=element_blank())
+
+base_world <- base_world_messy + cleanup
+
+base_world
+
+```
+
+```{r}
+latlong <- get(load("../data/LatLongCells_frame.rda"))
+```
+
+```{r}
+idx1 <- which(latlong[,2] > -50 & latlong[,2] < -10)
+idx2 <- which(latlong[,1] > 110 & latlong[,1] < 160)
+idx <- intersect(idx1, idx2)
+length(idx)
+latlong2 <- latlong[idx,]
+```
+
+
+```{r}
+birds_pa_data <- readRDS("../data/birds_presab_land_breeding_counts.rds")
+birds_pa_data_2 <- birds_pa_data[idx, ]
+birds_pa_data_3 <- birds_pa_data_2[, which(colSums(birds_pa_data_2)!=0)]
+```
+
+```{r}
+topics <- get(load("../output/Australia/methClust_6.rda"))
+```
+
+```{r}
+out <- CountClust::ExtractTopFeatures(topics$freq, top_features = 10, method = "poisson", options = "max")
+```
+
+## Presence-absence patterns of top driving birds
+
+```{r}
+PlotAssemblageIdx <- function(idx){
+  dat <- cbind.data.frame(latlong2, birds_pa_data_3[,idx])
+colnames(dat) <- c("Latitude", "Longitude", "Value")
+map_data_coloured <- 
+  base_world +
+  geom_point(data=dat, 
+             aes(x=Latitude, y=Longitude, colour=Value), size=0.5) +
+  scale_colour_gradient(low = "white", high = "black") 
+
+map_data_coloured
+}
+
+```
+
+
+### First cluster 
+
+```{r}
+par(mfrow = c(3,2))
+PlotAssemblageIdx(out$indices[1,1])
+PlotAssemblageIdx(out$indices[1,2])
+PlotAssemblageIdx(out$indices[1,3])
+PlotAssemblageIdx(out$indices[1,4])
+PlotAssemblageIdx(out$indices[1,5])
+PlotAssemblageIdx(out$indices[1,6])
+```
+
+
+### Second cluster 
+
+```{r}
+par(mfrow = c(3,2))
+PlotAssemblageIdx(out$indices[2,1])
+PlotAssemblageIdx(out$indices[2,2])
+PlotAssemblageIdx(out$indices[2,3])
+PlotAssemblageIdx(out$indices[2,4])
+PlotAssemblageIdx(out$indices[2,5])
+PlotAssemblageIdx(out$indices[2,6])
+```
+
+### Third cluster 
+
+```{r}
+par(mfrow = c(3,2))
+PlotAssemblageIdx(out$indices[3,1])
+PlotAssemblageIdx(out$indices[3,2])
+PlotAssemblageIdx(out$indices[3,3])
+PlotAssemblageIdx(out$indices[3,4])
+PlotAssemblageIdx(out$indices[3,5])
+PlotAssemblageIdx(out$indices[3,6])
+```
+
+
+### Fourth cluster 
+
+```{r}
+par(mfrow = c(3,2))
+PlotAssemblageIdx(out$indices[4,1])
+PlotAssemblageIdx(out$indices[4,2])
+PlotAssemblageIdx(out$indices[4,3])
+PlotAssemblageIdx(out$indices[4,4])
+PlotAssemblageIdx(out$indices[4,5])
+PlotAssemblageIdx(out$indices[4,6])
+```
+
+
+### Fifth cluster 
+
+```{r}
+par(mfrow = c(3,2))
+PlotAssemblageIdx(out$indices[5,1])
+PlotAssemblageIdx(out$indices[5,2])
+PlotAssemblageIdx(out$indices[5,3])
+PlotAssemblageIdx(out$indices[5,4])
+PlotAssemblageIdx(out$indices[5,5])
+PlotAssemblageIdx(out$indices[5,6])
+```
+
+### Sixth cluster 
+
+```{r}
+par(mfrow = c(3,2))
+PlotAssemblageIdx(out$indices[6,1])
+PlotAssemblageIdx(out$indices[6,2])
+PlotAssemblageIdx(out$indices[6,3])
+PlotAssemblageIdx(out$indices[6,4])
+PlotAssemblageIdx(out$indices[6,5])
+PlotAssemblageIdx(out$indices[6,6])
+```
+
+## Driving species names
+
+### Cluster 1
+
+```{r}
+rownames(topics$freq)[out$indices[1,1:10]]
+```
+
+### Cluster 2
+
+```{r}
+rownames(topics$freq)[out$indices[2,1:10]]
+```
+
+### Cluster 3
+
+```{r}
+rownames(topics$freq)[out$indices[3,1:10]]
+```
+
+### Cluster 4
+
+```{r}
+rownames(topics$freq)[out$indices[4,1:10]]
+```
+
+### Cluster 5
+
+```{r}
+rownames(topics$freq)[out$indices[5,1:10]]
+```
+
+### Cluster 6
+
+```{r}
+rownames(topics$freq)[out$indices[6,1:10]]
+```
+
+
+
+
+

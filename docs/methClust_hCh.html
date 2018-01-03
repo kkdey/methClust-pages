@@ -347,7 +347,8 @@ library(Seurat)</code></pre>
 ## 
 ##     ggsave</code></pre>
 <pre><code>## Loading required package: Matrix</code></pre>
-<pre class="r"><code>library(Rtsne)</code></pre>
+<pre class="r"><code>library(Rtsne)
+library(mapplots)</code></pre>
 <p>Load the methylation and non-methylation counts data</p>
 <pre class="r"><code>meth &lt;- read.table(&quot;../data/meth.txt&quot;, header = TRUE)
 unmeth &lt;- read.table(&quot;../data/unmeth_w_zero.txt&quot;, header = TRUE)
