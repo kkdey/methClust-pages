@@ -216,6 +216,8 @@ div.section {
 
 
 <p><a href="https://github.com/kkdey/methClust">methClust</a> is a software that fits Grade of Membership (GoM) model, much like <a href="https://bioconductor.org/packages/release/bioc/html/CountClust.html">CountClust</a>. The difference between <strong>methClust</strong> and <strong>CountClust</strong> lies in the model assumptions. <strong>CountClust</strong> assumes a Multinomial model for the counts for each sample and hence bases the clustering on the compositional content of the samples. <strong>methClust</strong> on the other hand assumes a Binomial model for the counts for each sample and ach feature and is applicable when there is a constraint on the size of the counts per cell but the total counts for a sample is not fixed.</p>
+<p>A detailed report on the broad results from the analysis are presented <a href="../talks/report.pdf">here</a>.</p>
+<p>For detailed breakdown of the analysis along with the relevant codes are presented below.</p>
 <div id="methclust-on-binary-data" class="section level2">
 <h2>methClust on binary data</h2>
 <p>We first apply a special elementary version <strong>methClust</strong> on Bernoulli or presence absence data. The immediate application it targets is ecological presence absence data of species in different sites.</p>
