@@ -13,9 +13,15 @@ The difference between **methClust** and **CountClust** lies in the model assump
 
 We first apply a special elementary version **methClust** on Bernoulli or presence absence data. The immediate application it targets is ecological presence absence data of species in different sites.
 
+### Model Framework
+
 [GoM model for binary presence-absence data : Model framework](binClust_model.html)
 
+### Simulation Examples
+
 [Simulation test of binary version of methClust with presence-absence data](methclust_grid_presence_absence.html)
+
+### Himalayan birds data (White el al 2018)
 
 [methClust on binary presence-absence taxonomic data: White et al (2018) Birds](ecostructure_fit.html)
 
@@ -23,11 +29,22 @@ We first apply a special elementary version **methClust** on Bernoulli or presen
 
 [Constructing global assemblage fields data from global binary presence absence data on birds : White et al (2018)](create_assemblage_presence_absenceRmd.html)
 
-[Binary methClust application on global cells by birds presence absence matrix : White et al (2008)](methClust_global_assemblages.html)
+### methClust on Global scale data
 
-[Binary methClust analysis of *Birds by cells* compared to *Cells by Birds* presence absence data : White et al (2018)](birds_cells_versus_cells_birds.html)
+We applied Binary methClust to the global presence absence data, as demonstrated [here]((methClust_global_assemblages.html). This analysis fitted the model on the *Cells by Birds* data matrix. Alternatively, we can also fit the model on the *Birds by Cells* data matrix, as depicted [here](birds_cells_versus_cells_birds.html).
 
-[Binary methClust detects Wallace Line as transition boundary between bird communities : White et al (2008)](methClust_Wallace.html)
+For the geoStructure representation examples, as in the [example](../output/geostructure_birds_globe_15_3.png), check out the R code [here](../code/geostructure_globe.R).
+
+
+We also applied Binary methClust to presence absence data for individual continents - [Australia](methClust_Australia.html), [Europe](methClust_Europe.html), [Africa](methClust_Africa.html), [Indian subcontinent](methClust_India.html),
+[South America](methclust_S_America.html), [North America](methclust_N_America.html).
+We found the GoM Structure plots to closely follow the climate patterns. 
+
+For the geoStructure representation examples, as in the [example](../output/Australia/geostructure_birds_6.png), check out the R code [here](../code/geostructure_australia.R). 
+
+Also, when restricted to the presence absence data of bird species , along the Wallace Line, Binary methclust detects Wallace Line as a transition boundary between two bird ecozones, check our analysis [here](methClust_Wallacea.html).
+
+The top bird species that drive the clusters - [Wallacea](wallace_line_driving_birds.html), [Australia](Australia_driving_birds.html).
 
 
 ## General methClust applications (methylation examples)
@@ -39,6 +56,8 @@ We now look at the model framework and applications of a more general form of **
 [Simulation example application of methClust](methclust_sim.html)
 
 [Application of methClust on Seb's hCh data - preliminary run](methClust_hCh.html)
+
+For the geoStructure representation, as in the [example](../output/methClust_hch_2.png) here, check out the R code [here](../code/geostructure_methclust_hCh.R)
 
 
 ## Support

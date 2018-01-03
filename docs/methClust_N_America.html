@@ -9,9 +9,11 @@
 <meta name="generator" content="pandoc" />
 
 
+<meta name="author" content="Kushal K Dey" />
 
+<meta name="date" content="2017-12-30" />
 
-<title>Home</title>
+<title>methClust in North America</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,6 +21,9 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -164,6 +169,101 @@ $(document).ready(function () {
 
 
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
 
 
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
@@ -210,50 +310,69 @@ div.section {
 
 
 
-<h1 class="title toc-ignore">Home</h1>
+<h1 class="title toc-ignore">methClust in North America</h1>
+<h4 class="author"><em>Kushal K Dey</em></h4>
+<h4 class="date"><em>12/30/2017</em></h4>
 
 </div>
 
 
-<p><a href="https://github.com/kkdey/methClust">methClust</a> is a software that fits Grade of Membership (GoM) model, much like <a href="https://bioconductor.org/packages/release/bioc/html/CountClust.html">CountClust</a>. The difference between <strong>methClust</strong> and <strong>CountClust</strong> lies in the model assumptions. <strong>CountClust</strong> assumes a Multinomial model for the counts for each sample and hence bases the clustering on the compositional content of the samples. <strong>methClust</strong> on the other hand assumes a Binomial model for the counts for each sample and ach feature and is applicable when there is a constraint on the size of the counts per cell but the total counts for a sample is not fixed.</p>
-<div id="methclust-on-binary-data" class="section level2">
-<h2>methClust on binary data</h2>
-<p>We first apply a special elementary version <strong>methClust</strong> on Bernoulli or presence absence data. The immediate application it targets is ecological presence absence data of species in different sites.</p>
-<div id="model-framework" class="section level3">
-<h3>Model Framework</h3>
-<p><a href="binClust_model.html">GoM model for binary presence-absence data : Model framework</a></p>
+<p>We run <strong>methClust</strong> on the birds presence absence data in the continent of North America.</p>
+<div id="plotting-maps-function" class="section level2">
+<h2>Plotting Maps Function</h2>
+<pre class="r"><code>latlong &lt;- get(load(&quot;../data/LatLongCells_frame.rda&quot;))</code></pre>
+<pre class="r"><code>world_map &lt;- map_data(&quot;world&quot;)
+world_map &lt;- world_map[world_map$region != &quot;Antarctica&quot;,] # intercourse antarctica
+
+world_map &lt;- world_map[world_map$long &gt; -150 &amp; world_map$long &lt; -30, ]
+world_map &lt;- world_map[world_map$lat &gt; 15 &amp; world_map$lat &lt; 80, ]
+
+
+p &lt;- ggplot() + coord_fixed() +
+  xlab(&quot;&quot;) + ylab(&quot;&quot;)
+
+#Add map to base plot
+base_world_messy &lt;- p + geom_polygon(data=world_map, aes(x=long, y=lat, group=group), colour=&quot;light green&quot;, fill=&quot;light green&quot;)
+
+cleanup &lt;- 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_rect(fill = &#39;white&#39;, colour = &#39;white&#39;), 
+        axis.line = element_line(colour = &quot;white&quot;), legend.position=&quot;none&quot;,
+        axis.ticks=element_blank(), axis.text.x=element_blank(),
+        axis.text.y=element_blank())
+
+base_world &lt;- base_world_messy + cleanup
+
+base_world</code></pre>
+<p><img src="methClust_N_America_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 </div>
-<div id="simulation-examples" class="section level3">
-<h3>Simulation Examples</h3>
-<p><a href="methclust_grid_presence_absence.html">Simulation test of binary version of methClust with presence-absence data</a></p>
-</div>
-<div id="himalayan-birds-data-white-el-al-2018" class="section level3">
-<h3>Himalayan birds data (White el al 2018)</h3>
-<p><a href="ecostructure_fit.html">methClust on binary presence-absence taxonomic data: White et al (2018) Birds</a></p>
-<p><a href="methclust_himalayas.html">methClust on binary regional assemblage data: White et al (2018) Birds</a></p>
-<p><a href="create_assemblage_presence_absenceRmd.html">Constructing global assemblage fields data from global binary presence absence data on birds : White et al (2018)</a></p>
-</div>
-<div id="methclust-on-global-scale-data" class="section level3">
-<h3>methClust on Global scale data</h3>
-<p>We applied Binary methClust to the global presence absence data, as demonstrated [here]((methClust_global_assemblages.html). This analysis fitted the model on the <em>Cells by Birds</em> data matrix. Alternatively, we can also fit the model on the <em>Birds by Cells</em> data matrix, as depicted <a href="birds_cells_versus_cells_birds.html">here</a>.</p>
-<p>For the geoStructure representation examples, as in the <a href="../output/geostructure_birds_globe_15_3.png">example</a>, check out the R code <a href="../code/geostructure_globe.R">here</a>.</p>
-<p>We also applied Binary methClust to presence absence data for individual continents - <a href="methClust_Australia.html">Australia</a>, <a href="methClust_Europe.html">Europe</a>, <a href="methClust_Africa.html">Africa</a>, <a href="methClust_India.html">Indian subcontinent</a>, <a href="methclust_S_America.html">South America</a>, <a href="methclust_N_America.html">North America</a>. We found the GoM Structure plots to closely follow the climate patterns.</p>
-<p>For the geoStructure representation examples, as in the <a href="../output/Australia/geostructure_birds_6.png">example</a>, check out the R code <a href="../code/geostructure_australia.R">here</a>.</p>
-<p>Also, when restricted to the presence absence data of bird species , along the Wallace Line, Binary methclust detects Wallace Line as a transition boundary between two bird ecozones, check our analysis <a href="methClust_Wallacea.html">here</a>.</p>
-<p>The top bird species that drive the clusters - <a href="wallace_line_driving_birds.html">Wallacea</a>, <a href="Australia_driving_birds.html">Australia</a>.</p>
-</div>
-</div>
-<div id="general-methclust-applications-methylation-examples" class="section level2">
-<h2>General methClust applications (methylation examples)</h2>
-<p>We now look at the model framework and applications of a more general form of <strong>methClust</strong>.</p>
-<p><a href="methclust_model.html">Model Framework</a></p>
-<p><a href="methclust_sim.html">Simulation example application of methClust</a></p>
-<p><a href="methClust_hCh.html">Application of methClust on Seb’s hCh data - preliminary run</a></p>
-<p>For the geoStructure representation, as in the <a href="../output/methClust_hch_2.png">example</a> here, check out the R code <a href="../code/geostructure_methclust_hCh.R">here</a></p>
-</div>
-<div id="support" class="section level2">
-<h2>Support</h2>
-<p>For any queries related to the <strong>methclust</strong> package, contact Kushal K. Dey here <a href="kkdey@uchicago.edu" class="uri">kkdey@uchicago.edu</a></p>
+<div id="extracting-indian-birds-presence-absence-data" class="section level2">
+<h2>Extracting Indian birds presence absence data</h2>
+<pre class="r"><code>latlong &lt;- get(load(&quot;../data/LatLongCells_frame.rda&quot;))</code></pre>
+<pre class="r"><code>idx1 &lt;- which(latlong[,2] &gt; 15 &amp; latlong[,2] &lt; 80)
+idx2 &lt;- which(latlong[,1] &gt; -150 &amp; latlong[,1] &lt; -30)
+idx &lt;- intersect(idx1, idx2)
+length(idx)</code></pre>
+<pre><code>## [1] 3477</code></pre>
+<pre class="r"><code>latlong2 &lt;- latlong[idx,]</code></pre>
+<pre class="r"><code>birds_pa_data &lt;- readRDS(&quot;../data/birds_presab_land_breeding_counts.rds&quot;)
+birds_pa_data_2 &lt;- birds_pa_data[idx, ]
+birds_pa_data_3 &lt;- birds_pa_data_2[, which(colSums(birds_pa_data_2) != 0)]</code></pre>
+<pre class="r"><code>PlotAssemblageIdx &lt;- function(idx){
+  dat &lt;- cbind.data.frame(latlong2, birds_pa_data_3[,idx])
+colnames(dat) &lt;- c(&quot;Latitude&quot;, &quot;Longitude&quot;, &quot;Value&quot;)
+map_data_coloured &lt;- 
+  base_world +
+  geom_point(data=dat, 
+             aes(x=Latitude, y=Longitude, colour=Value), size=0.5) +
+  scale_colour_gradient(low = &quot;white&quot;, high = &quot;black&quot;) 
+
+map_data_coloured
+}</code></pre>
+<p>We apply <strong>methClust</strong> on the presence-absence data of relevant bird species in North America.</p>
+<pre class="r"><code>topics &lt;- meth_topics(birds_pa_data_3, 1 - birds_pa_data_3, 
+            K=7, tol = 10, use_squarem = FALSE)
+save(topics, file = &quot;../output/N_America/methClust_7.rda&quot;)</code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
@@ -294,6 +413,8 @@ footer is added to webpages before the MathJax javascript. -->
 -->
 
 
+</div>
+</div>
 
 </div>
 

@@ -81,6 +81,21 @@ birds_pa_data_3 <- birds_pa_data_2[, which(colSums(birds_pa_data_2) > 10)]
 ## Example presence-absence data of bird species 
 
 ```{r}
+PlotAssemblageIdx <- function(idx){
+  dat <- cbind.data.frame(latlong2, birds_pa_data_3[,idx])
+colnames(dat) <- c("Latitude", "Longitude", "Value")
+map_data_coloured <- 
+  base_world +
+  geom_point(data=dat, 
+             aes(x=Latitude, y=Longitude, colour=Value), size=0.5) +
+  scale_colour_gradient(low = "white", high = "black") 
+
+map_data_coloured
+}
+
+```
+
+```{r}
 par(mfrow = c(3,2))
 PlotAssemblageIdx(1)
 PlotAssemblageIdx(10)

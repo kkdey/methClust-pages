@@ -114,20 +114,3 @@ topics <- meth_topics(birds_pa_data_3, 1 - birds_pa_data_3,
             K=10, tol = 10, use_squarem = FALSE)
 save(topics, file = "../output/India/methClust_10.rda")
 ```
-
-
-```{r}
-PlotAssemblageIdx2 <- function(dat){
-  dat <- cbind.data.frame(latlong2, dat)
-colnames(dat) <- c("Latitude", "Longitude", "Value")
-map_data_coloured <- 
-  base_world +
-  geom_point(data=dat, 
-             aes(x=Latitude, y=Longitude, colour=Value), size=0.5) +
-  scale_colour_gradient(low = "white", high = "black") 
-
-map_data_coloured
-}
-
-```
-

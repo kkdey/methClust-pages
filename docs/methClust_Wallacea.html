@@ -11,9 +11,9 @@
 
 <meta name="author" content="Kushal K Dey" />
 
-<meta name="date" content="2017-12-18" />
+<meta name="date" content="2017-12-25" />
 
-<title>methClust along Wallace Line</title>
+<title>methclust along Wallace</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -310,9 +310,9 @@ div.section {
 
 
 
-<h1 class="title toc-ignore">methClust along Wallace Line</h1>
+<h1 class="title toc-ignore">methclust along Wallace</h1>
 <h4 class="author"><em>Kushal K Dey</em></h4>
-<h4 class="date"><em>12/18/2017</em></h4>
+<h4 class="date"><em>12/25/2017</em></h4>
 
 </div>
 
@@ -324,8 +324,8 @@ div.section {
 <pre class="r"><code>world_map &lt;- map_data(&quot;world&quot;)
 world_map &lt;- world_map[world_map$region != &quot;Antarctica&quot;,] # intercourse antarctica
 
-world_map &lt;- world_map[world_map$long &gt; 100 &amp; world_map$long &lt; 150, ]
-world_map &lt;- world_map[world_map$lat &gt; -10 &amp; world_map$lat &lt; 10, ]
+world_map &lt;- world_map[world_map$long &gt; 90 &amp; world_map$long &lt; 160, ]
+world_map &lt;- world_map[world_map$lat &gt; -18 &amp; world_map$lat &lt; 20, ]
 
 
 p &lt;- ggplot() + coord_fixed() +
@@ -344,16 +344,16 @@ cleanup &lt;-
 base_world &lt;- base_world_messy + cleanup
 
 base_world</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><img src="methClust_Wallacea_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 </div>
 <div id="extracting-wallace-line-presence-absence-data" class="section level2">
 <h2>Extracting Wallace Line presence absence data</h2>
 <pre class="r"><code>latlong &lt;- get(load(&quot;../data/LatLongCells_frame.rda&quot;))</code></pre>
-<pre class="r"><code>idx1 &lt;- which(latlong[,2] &gt; -10 &amp; latlong[,2] &lt; 10)
-idx2 &lt;- which(latlong[,1] &gt; 100 &amp; latlong[,1] &lt; 150)
+<pre class="r"><code>idx1 &lt;- which(latlong[,2] &gt; -18 &amp; latlong[,2] &lt; 20)
+idx2 &lt;- which(latlong[,1] &gt; 90 &amp; latlong[,1] &lt; 160)
 idx &lt;- intersect(idx1, idx2)
 length(idx)</code></pre>
-<pre><code>## [1] 364</code></pre>
+<pre><code>## [1] 703</code></pre>
 <pre class="r"><code>latlong2 &lt;- latlong[idx,]</code></pre>
 <pre class="r"><code>birds_pa_data &lt;- readRDS(&quot;../data/birds_presab_land_breeding_counts.rds&quot;)
 birds_pa_data_2 &lt;- birds_pa_data[idx, ]
@@ -374,52 +374,36 @@ map_data_coloured
 <h2>Example presence-absence data of bird species</h2>
 <pre class="r"><code>par(mfrow = c(6,2))
 PlotAssemblageIdx(1)</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="methClust_Wallacea_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <pre class="r"><code>PlotAssemblageIdx(10)</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+<p><img src="methClust_Wallacea_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
 <pre class="r"><code>PlotAssemblageIdx(100)</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-7-3.png" width="672" /></p>
+<p><img src="methClust_Wallacea_files/figure-html/unnamed-chunk-7-3.png" width="672" /></p>
 <pre class="r"><code>PlotAssemblageIdx(500)</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-7-4.png" width="672" /></p>
+<p><img src="methClust_Wallacea_files/figure-html/unnamed-chunk-7-4.png" width="672" /></p>
 <pre class="r"><code>PlotAssemblageIdx(700)</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-7-5.png" width="672" /></p>
+<p><img src="methClust_Wallacea_files/figure-html/unnamed-chunk-7-5.png" width="672" /></p>
 <pre class="r"><code>PlotAssemblageIdx(1000)</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-7-6.png" width="672" /></p>
+<p><img src="methClust_Wallacea_files/figure-html/unnamed-chunk-7-6.png" width="672" /></p>
 <pre class="r"><code>PlotAssemblageIdx(1100)</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-7-7.png" width="672" /></p>
+<p><img src="methClust_Wallacea_files/figure-html/unnamed-chunk-7-7.png" width="672" /></p>
 <pre class="r"><code>PlotAssemblageIdx(1200)</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-7-8.png" width="672" /></p>
+<p><img src="methClust_Wallacea_files/figure-html/unnamed-chunk-7-8.png" width="672" /></p>
 <pre class="r"><code>PlotAssemblageIdx(1300)</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-7-9.png" width="672" /></p>
+<p><img src="methClust_Wallacea_files/figure-html/unnamed-chunk-7-9.png" width="672" /></p>
 <pre class="r"><code>PlotAssemblageIdx(1400)</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-7-10.png" width="672" /></p>
+<p><img src="methClust_Wallacea_files/figure-html/unnamed-chunk-7-10.png" width="672" /></p>
 <pre class="r"><code>PlotAssemblageIdx(1500)</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-7-11.png" width="672" /></p>
+<p><img src="methClust_Wallacea_files/figure-html/unnamed-chunk-7-11.png" width="672" /></p>
 <pre class="r"><code>PlotAssemblageIdx(1600)</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-7-12.png" width="672" /></p>
+<p><img src="methClust_Wallacea_files/figure-html/unnamed-chunk-7-12.png" width="672" /></p>
 </div>
 <div id="application-of-methclust-and-visualization" class="section level2">
 <h2>Application of methClust and visualization</h2>
 <p>We apply <strong>methClust</strong> on the presence-absence data of relevant bird species along the Wallace Line.</p>
 <pre class="r"><code>topics &lt;- meth_topics(birds_pa_data_3, 1 - birds_pa_data_3, 
-            K=5, tol = 0.1, use_squarem = FALSE)</code></pre>
-<pre class="r"><code>topics &lt;- get(load(&quot;../output/methClust_wallace_K_2.rda&quot;))</code></pre>
-<pre class="r"><code>PlotAssemblageIdx2 &lt;- function(dat){
-  dat &lt;- cbind.data.frame(latlong2, dat)
-colnames(dat) &lt;- c(&quot;Latitude&quot;, &quot;Longitude&quot;, &quot;Value&quot;)
-map_data_coloured &lt;- 
-  base_world +
-  geom_point(data=dat, 
-             aes(x=Latitude, y=Longitude, colour=Value), size=0.5) +
-  scale_colour_gradient(low = &quot;white&quot;, high = &quot;black&quot;) 
-
-map_data_coloured
-}</code></pre>
-<pre class="r"><code>PlotAssemblageIdx2(topics$omega[,1])</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
-<pre class="r"><code>PlotAssemblageIdx2(topics$omega[,2])</code></pre>
-<p><img src="methClust_Wallace_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
-<p>You can see that both clusters have partial grades of membership along the Wallace line (points shaded grey). But one cluster is mainly driven by bird species to the north of the Wallace Line while the other cluster driven by bird species to the south of Wallace Line.</p>
+            K=2, tol = 0.1, use_squarem = FALSE)
+save(topics, file = &quot;../output/Wallacea/methClust_2.rda&quot;)</code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
