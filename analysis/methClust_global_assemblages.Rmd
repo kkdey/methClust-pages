@@ -115,8 +115,9 @@ PlotAssemblageIdx(topics_omega[,6])
 
 ```
 
+## K= 7
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE}
 
 K7_global_topics <- get(load(file="../data/birds_meth_cluster_7.rda"))
 
@@ -131,8 +132,9 @@ PlotAssemblageIdx(topics_omega[,7])
 
 ```
 
+## K= 8
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE}
 
 K8_global_topics <- get(load(file="../data/birds_meth_cluster_8.rda"))
 
@@ -144,6 +146,8 @@ PlotAssemblageIdx(topics_omega[,4])
 PlotAssemblageIdx(topics_omega[,5])
 PlotAssemblageIdx(topics_omega[,6])
 PlotAssemblageIdx(topics_omega[,7])
+PlotAssemblageIdx(topics_omega[,8])
+
 
 ```
 
