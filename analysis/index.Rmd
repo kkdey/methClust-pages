@@ -36,7 +36,7 @@ We first apply a special elementary version **methClust** on Bernoulli or presen
 
 ### methClust on Global scale data
 
-We applied Binary methClust to the global presence absence data, as demonstrated [here]((methClust_global_assemblages.html). This analysis fitted the model on the *Cells by Birds* data matrix. Alternatively, we can also fit the model on the *Birds by Cells* data matrix, as depicted [here](birds_cells_versus_cells_birds.html).
+We applied Binary methClust to the global presence absence data, as demonstrated [here](methClust_global_assemblages.html). This analysis fitted the model on the *Cells by Birds* data matrix. Alternatively, we can also fit the model on the *Birds by Cells* data matrix, as depicted [here](birds_cells_versus_cells_birds.html).
 
 For the geoStructure representation examples, as in the [example](../output/geostructure_birds_globe_15_3.png), check out the R code [here](../code/geostructure_globe.R).
 
