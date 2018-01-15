@@ -26,7 +26,7 @@ We first apply a special elementary version **methClust** on Bernoulli or presen
 
 [Simulation test of binary version of methClust with presence-absence data](methclust_grid_presence_absence.html)
 
-### Himalayan birds data (White el al 2018)
+### Himalayan birds data (White et al 2018)
 
 [methClust on binary presence-absence taxonomic data: White et al (2018) Birds](ecostructure_fit.html)
 

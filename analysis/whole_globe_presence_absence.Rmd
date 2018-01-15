@@ -22,7 +22,7 @@ dim(data_2)
 ```
 
 ```{r eval=TRUE, warning = FALSE, message = FALSE}
-topics <- meth_topics(data_2, 1-data_2, K=2, tol = 100, use_squarem = FALSE)
+topics <- meth_topics(data_2, 1-data_2, K=6, tol = 100, use_squarem = FALSE)
 ```
 
 
