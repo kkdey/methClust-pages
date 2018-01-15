@@ -151,10 +151,11 @@ PlotAssemblageIdx(topics_omega[,8])
 
 ```
 
+## K= 10
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE}
 
-K10_global_topics <- get(load(file="../output/birds_meth_cluster_10.rda"))
+K10_global_topics <- get(load(file="../data/birds_meth_cluster_10.rda"))
 
 topics_omega <- K10_global_topics$omega
 PlotAssemblageIdx(topics_omega[,1])
@@ -169,9 +170,11 @@ PlotAssemblageIdx(topics_omega[,9])
 PlotAssemblageIdx(topics_omega[,10])
 ```
 
-```{r, echo=FALSE, eval=FALSE}
+## K= 11
 
-K11_global_topics <- get(load(file="../output/birds_meth_cluster_11.rda"))
+```{r, echo=FALSE}
+
+K11_global_topics <- get(load(file="../data/birds_meth_cluster_11.rda"))
 
 topics_omega <- K11_global_topics$omega
 PlotAssemblageIdx(topics_omega[,1])
@@ -188,10 +191,11 @@ PlotAssemblageIdx(topics_omega[,11])
 
 ```
 
+## K=15
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, echo=FALSE}
 
-K15_global_topics <- get(load(file="../output/birds_meth_cluster_15.rda"))
+K15_global_topics <- get(load(file="../data/birds_meth_cluster_15.rda"))
 
 topics_omega <- K15_global_topics$omega
 PlotAssemblageIdx(topics_omega[,1])
