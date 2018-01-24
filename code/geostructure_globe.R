@@ -4,9 +4,50 @@
 
 latlong <- get(load("../data/LatLongCells_frame.rda"))
 
-K10_global_topics <- get(load(file="../output/birds_meth_cluster_10.rda"))
+library(ggplot2)
+library(maps)
+library(mapdata)
+library(mapplots)
 
-png(filename="../output/geostructure_birds_globe_2.png",width = 1500, height = 800)
+
+######################   K = 6   ####################################
+
+K6_global_topics <- get(load(file="../data/birds_meth_cluster_6.rda"))
+
+intensity <- 0.9
+png(filename="../output/geostructure_birds_globe_6.png",width = 2000, height = 1000)
+color <- c("dodgerblue2","#E31A1C",
+          "green4", "#6A3D9A",
+          "#FF7F00",
+          "black",
+          "gold1",
+          "skyblue2","#FB9A99",
+          "palegreen2", "#CAB2D6", "#FDBF6F",  "gray70", "khaki2", "maroon","orchid1","deeppink1",
+          "blue1","steelblue4", "darkturquoise","green1","yellow4","yellow3", "darkorange4","brown")
+
+map('worldHires', fill=FALSE, interior = FALSE, resolution = 10)
+lapply(1:dim(K6_global_topics$omega)[1], function(r)
+  add.pie(z=as.integer(100*K6_global_topics$omega[r,]),
+          x=latlong[r,1], y=latlong[r,2], labels=c("","",""),
+          radius = 1,
+          col=c(alpha(color[1],intensity),alpha(color[2],intensity),
+                alpha(color[3], intensity), alpha(color[4], intensity),
+                alpha(color[5], intensity), alpha(color[6], intensity),
+                alpha(color[7], intensity), alpha(color[8], intensity),
+                alpha(color[9], intensity), alpha(color[10], intensity),
+                alpha(color[11], intensity),  alpha(color[12], intensity),
+                alpha(color[13], intensity),  alpha(color[14], intensity),
+                alpha(color[15], intensity))));
+dev.off()
+
+
+
+
+######################   K = 10   ####################################
+
+K10_global_topics <- get(load(file="../data/birds_meth_cluster_10.rda"))
+
+png(filename="../output/geostructure_birds_globe_10.png",width = 1500, height = 800)
 
 map("worldHires",
     col = "gray", fill=TRUE, mar=c(0.1,0.1,0.1,0.1))
@@ -102,7 +143,14 @@ lapply(1:dim(K2_global_topics$omega)[1], function(r)
 dev.off()
 
 
-K5_global_topics <- get(load(file="../output/birds_meth_cluster_5.rda"))
+K21_global_topics <- get(load(file="../data/birds_meth_cluster_21.rda"))
+
+idx <- which(K21_global_topics$omega[,1] > 0.5)
+omega <- K21_global_topics$omega[-idx,]
+latlong2 <- latlong[-idx,]
+omega2 <- omega[,-1]
+omega2 <- t(apply(omega2, 1, function(x) return(x/sum(x))))
+
 
 intensity <- 1
 set.seed(200)
@@ -111,20 +159,123 @@ color_full=c("red","blue","cornflowerblue","black","cyan","darkblue",
              "firebrick","darkorchid","hotpink","green","magenta","yellow", "azure1","azure4");
 color = c("red", "cornflowerblue", "cyan", "brown4", "burlywood", "darkgoldenrod1",
           "azure4", "green","deepskyblue","yellow", "azure1")
-png(filename="../output/geostructure_birds_globe_5.png",width = 2000, height = 1000)
+color = c("dodgerblue2","#E31A1C",
+          "green4", "#6A3D9A",
+          "#FF7F00",
+          "black",
+          "gold1",
+          "skyblue2","#FB9A99",
+          "palegreen2", "#CAB2D6", "#FDBF6F",  "gray70", "khaki2", "maroon","orchid1","deeppink1",
+          "blue1","steelblue4", "darkturquoise","green1","yellow4","yellow3", "darkorange4","brown")
+tiff("../output/geostructure_birds_globe_21.tiff",width = 2500, height = 1500)
 map('worldHires', fill=FALSE, interior = FALSE, resolution = 10)
-lapply(1:dim(K5_global_topics$omega)[1], function(r)
-  add.pie(z=as.integer(100*K5_global_topics$omega[r,]),
-          x=latlong[r,1], y=latlong[r,2], labels=c("","",""),
-          radius = 0.8,
-          col=c(alpha(color[1],intensity),alpha(color[2],intensity),
+lapply(1:dim(omega2)[1], function(r)
+  add.pie(z=as.integer(100*omega2[r,]),
+          x=latlong2[r,1], y=latlong2[r,2], labels=c("","",""),
+          radius = 0.6, border = NULL,
+          col=c(alpha(color[1],intensity), alpha(color[2],intensity),
                 alpha(color[3], intensity), alpha(color[4], intensity),
                 alpha(color[5], intensity), alpha(color[6], intensity),
                 alpha(color[7], intensity), alpha(color[8], intensity),
                 alpha(color[9], intensity), alpha(color[10], intensity),
-                alpha(color[11], intensity))));
+                alpha(color[11], intensity), alpha(color[12], intensity),
+                alpha(color[13], intensity),alpha(color[14], intensity),
+                alpha(color[15], intensity), alpha(color[16], intensity),
+                alpha(color[17], intensity), alpha(color[18], intensity),
+                alpha(color[19], intensity), alpha(color[20], intensity),
+                alpha(color[21], intensity), alpha(color[22], intensity),
+                alpha(color[23], intensity))));
 dev.off()
 
+
+K8_global_topics <- get(load(file="../data/birds_meth_cluster_8.rda"))
+
+idx <- which(K8_global_topics$omega[,1] > 0.5)
+omega <- K8_global_topics$omega[-idx,]
+latlong2 <- latlong[-idx,]
+omega2 <- omega[,-1]
+omega2 <- t(apply(omega2, 1, function(x) return(x/sum(x))))
+
+
+intensity <- 1
+set.seed(200)
+color_full=c("red","blue","cornflowerblue","black","cyan","darkblue",
+             "brown4","burlywood","darkgoldenrod1","darkgray","deepskyblue","darkkhaki",
+             "firebrick","darkorchid","hotpink","green","magenta","yellow", "azure1","azure4");
+color = c("red", "cornflowerblue", "cyan", "brown4", "burlywood", "darkgoldenrod1",
+          "azure4", "green","deepskyblue","yellow", "azure1")
+color = c("dodgerblue2","#E31A1C",
+          "green4", "#6A3D9A",
+          "#FF7F00",
+          "black",
+          "gold1",
+          "skyblue2","#FB9A99",
+          "palegreen2", "#CAB2D6", "#FDBF6F",  "gray70", "khaki2", "maroon","orchid1","deeppink1",
+          "blue1","steelblue4", "darkturquoise","green1","yellow4","yellow3", "darkorange4","brown")
+tiff("../output/geostructure_birds_globe_8.tiff",width = 2500, height = 1500)
+map('worldHires', fill=FALSE, interior = FALSE, resolution = 10)
+lapply(1:dim(omega2)[1], function(r)
+  add.pie(z=as.integer(100*omega2[r,]),
+          x=latlong2[r,1], y=latlong2[r,2], labels=c("","",""),
+          radius = 0.6, border = NULL,
+          col=c(alpha(color[1],intensity), alpha(color[2],intensity),
+                alpha(color[3], intensity), alpha(color[4], intensity),
+                alpha(color[5], intensity), alpha(color[6], intensity),
+                alpha(color[7], intensity), alpha(color[8], intensity),
+                alpha(color[9], intensity), alpha(color[10], intensity),
+                alpha(color[11], intensity), alpha(color[12], intensity),
+                alpha(color[13], intensity),alpha(color[14], intensity),
+                alpha(color[15], intensity), alpha(color[16], intensity),
+                alpha(color[17], intensity), alpha(color[18], intensity),
+                alpha(color[19], intensity), alpha(color[20], intensity),
+                alpha(color[21], intensity), alpha(color[22], intensity),
+                alpha(color[23], intensity))));
+dev.off()
+
+
+K6_global_topics <- get(load(file="../data/birds_meth_cluster_6.rda"))
+
+idx <- which(K6_global_topics$omega[,1] > 0.5)
+omega <- K6_global_topics$omega[-idx,]
+latlong2 <- latlong[-idx,]
+omega2 <- omega[,-1]
+omega2 <- t(apply(omega2, 1, function(x) return(x/sum(x))))
+
+
+intensity <- 1
+set.seed(200)
+color_full=c("red","blue","cornflowerblue","black","cyan","darkblue",
+             "brown4","burlywood","darkgoldenrod1","darkgray","deepskyblue","darkkhaki",
+             "firebrick","darkorchid","hotpink","green","magenta","yellow", "azure1","azure4");
+color = c("red", "cornflowerblue", "cyan", "brown4", "burlywood", "darkgoldenrod1",
+          "azure4", "green","deepskyblue","yellow", "azure1")
+color = c("dodgerblue2","#E31A1C",
+          "green4", "#6A3D9A",
+          "#FF7F00",
+          "black",
+          "gold1",
+          "skyblue2","#FB9A99",
+          "palegreen2", "#CAB2D6", "#FDBF6F",  "gray70", "khaki2", "maroon","orchid1","deeppink1",
+          "blue1","steelblue4", "darkturquoise","green1","yellow4","yellow3", "darkorange4","brown")
+tiff("../output/geostructure_birds_globe_6.tiff",width = 2500, height = 1500)
+map('worldHires', fill=FALSE, interior = FALSE, resolution = 10)
+lapply(1:dim(omega2)[1], function(r)
+  add.pie(z=as.integer(100*omega2[r,]),
+          x=latlong2[r,1], y=latlong2[r,2], labels=c("","",""),
+          radius = 0.6, border = NULL,
+          col=c(alpha(color[1],intensity), alpha(color[2],intensity),
+                alpha(color[3], intensity), alpha(color[4], intensity),
+                alpha(color[5], intensity), alpha(color[6], intensity),
+                alpha(color[7], intensity), alpha(color[8], intensity),
+                alpha(color[9], intensity), alpha(color[10], intensity),
+                alpha(color[11], intensity), alpha(color[12], intensity),
+                alpha(color[13], intensity),alpha(color[14], intensity),
+                alpha(color[15], intensity), alpha(color[16], intensity),
+                alpha(color[17], intensity), alpha(color[18], intensity),
+                alpha(color[19], intensity), alpha(color[20], intensity),
+                alpha(color[21], intensity), alpha(color[22], intensity),
+                alpha(color[23], intensity))));
+dev.off()
 
 
 
@@ -195,3 +346,115 @@ lapply(1:dim(topics_omega)[1], function(r)
                 alpha(color[15], intensity))));
 dev.off()
 
+##########################   K = 31  #############################################
+
+
+K31_global_topics <- get(load(file="../data/birds_meth_cluster_31.rda"))
+
+idx <- which(K31_global_topics$omega[,1] > 0.5)
+omega <- K31_global_topics$omega[-idx,]
+latlong2 <- latlong[-idx,]
+omega2 <- omega[,-1]
+omega2 <- t(apply(omega2, 1, function(x) return(x/sum(x))))
+
+
+intensity <- 1
+set.seed(200)
+color_full=c("red","blue","cornflowerblue","black","cyan","darkblue",
+             "brown4","burlywood","darkgoldenrod1","darkgray","deepskyblue","darkkhaki",
+             "firebrick","darkorchid","hotpink","green","magenta","yellow", "azure1","azure4");
+color = c("red", "cornflowerblue", "cyan", "brown4", "burlywood", "darkgoldenrod1",
+          "azure4", "green","deepskyblue","yellow", "azure1")
+color = c("dodgerblue2","#E31A1C",
+          "green4", "#6A3D9A",
+          "#FF7F00",
+          "black",
+          "gold1",
+          "skyblue2","#FB9A99",
+          "palegreen2", "#CAB2D6", "#FDBF6F",  "gray70", "khaki2", "maroon","orchid1","deeppink1",
+          "blue1","steelblue4", "darkturquoise","green1","yellow4","yellow3", "darkorange4","brown",
+          "red", "cornflowerblue", "cyan", "brown4", "burlywood", "darkgoldenrod1",
+          "azure4", "green","deepskyblue","yellow", "azure1")
+tiff("../output/geostructure_birds_globe_31.tiff",width = 2500, height = 1500)
+map('worldHires', fill=FALSE, interior = FALSE, resolution = 10)
+lapply(1:dim(omega2)[1], function(r)
+  add.pie(z=as.integer(100*omega2[r,]),
+          x=latlong2[r,1], y=latlong2[r,2], labels=c("","",""),
+          radius = 0.6, border = NULL,
+          col=c(alpha(color[1],intensity), alpha(color[2],intensity),
+                alpha(color[3], intensity), alpha(color[4], intensity),
+                alpha(color[5], intensity), alpha(color[6], intensity),
+                alpha(color[7], intensity), alpha(color[8], intensity),
+                alpha(color[9], intensity), alpha(color[10], intensity),
+                alpha(color[11], intensity), alpha(color[12], intensity),
+                alpha(color[13], intensity),alpha(color[14], intensity),
+                alpha(color[15], intensity), alpha(color[16], intensity),
+                alpha(color[17], intensity), alpha(color[18], intensity),
+                alpha(color[19], intensity), alpha(color[20], intensity),
+                alpha(color[21], intensity), alpha(color[22], intensity),
+                alpha(color[23], intensity), alpha(color[24], intensity),
+                alpha(color[25], intensity), alpha(color[26], intensity),
+                alpha(color[27], intensity), alpha(color[28], intensity),
+                alpha(color[29], intensity), alpha(color[30], intensity),
+                alpha(color[31], intensity), alpha(color[32], intensity),
+                alpha(color[33], intensity), alpha(color[34], intensity),
+                alpha(color[35], intensity)
+                )));
+dev.off()
+
+
+##########################   K = 31  #############################################
+
+
+K33_global_topics <- get(load(file="../data/birds_meth_cluster_33.rda"))
+
+idx <- which(K33_global_topics$omega[,1] > 0.5)
+omega <- K33_global_topics$omega[-idx,]
+latlong2 <- latlong[-idx,]
+omega2 <- omega[,-1]
+omega2 <- t(apply(omega2, 1, function(x) return(x/sum(x))))
+
+
+intensity <- 1
+set.seed(200)
+color_full=c("red","blue","cornflowerblue","black","cyan","darkblue",
+             "brown4","burlywood","darkgoldenrod1","darkgray","deepskyblue","darkkhaki",
+             "firebrick","darkorchid","hotpink","green","magenta","yellow", "azure1","azure4");
+color = c("red", "cornflowerblue", "cyan", "brown4", "burlywood", "darkgoldenrod1",
+          "azure4", "green","deepskyblue","yellow", "azure1")
+color = c("dodgerblue2","#E31A1C",
+          "green4", "#6A3D9A",
+          "#FF7F00",
+          "black",
+          "gold1",
+          "skyblue2","#FB9A99",
+          "palegreen2", "#CAB2D6", "#FDBF6F",  "gray70", "khaki2", "maroon","orchid1","deeppink1",
+          "blue1","steelblue4", "darkturquoise","green1","yellow4","yellow3", "darkorange4","brown",
+          "red", "cornflowerblue", "cyan", "brown4", "burlywood", "darkgoldenrod1",
+          "azure4", "green","deepskyblue","yellow", "azure1")
+tiff("../output/geostructure_birds_globe_33.tiff",width = 2500, height = 1500)
+map('worldHires', fill=FALSE, interior = FALSE, resolution = 10)
+lapply(1:dim(omega2)[1], function(r)
+  add.pie(z=as.integer(100*omega2[r,]),
+          x=latlong2[r,1], y=latlong2[r,2], labels=c("","",""),
+          radius = 0.6, border = NULL,
+          col=c(alpha(color[1],intensity), alpha(color[2],intensity),
+                alpha(color[3], intensity), alpha(color[4], intensity),
+                alpha(color[5], intensity), alpha(color[6], intensity),
+                alpha(color[7], intensity), alpha(color[8], intensity),
+                alpha(color[9], intensity), alpha(color[10], intensity),
+                alpha(color[11], intensity), alpha(color[12], intensity),
+                alpha(color[13], intensity),alpha(color[14], intensity),
+                alpha(color[15], intensity), alpha(color[16], intensity),
+                alpha(color[17], intensity), alpha(color[18], intensity),
+                alpha(color[19], intensity), alpha(color[20], intensity),
+                alpha(color[21], intensity), alpha(color[22], intensity),
+                alpha(color[23], intensity), alpha(color[24], intensity),
+                alpha(color[25], intensity), alpha(color[26], intensity),
+                alpha(color[27], intensity), alpha(color[28], intensity),
+                alpha(color[29], intensity), alpha(color[30], intensity),
+                alpha(color[31], intensity), alpha(color[32], intensity),
+                alpha(color[33], intensity), alpha(color[34], intensity),
+                alpha(color[35], intensity)
+          )));
+dev.off()
