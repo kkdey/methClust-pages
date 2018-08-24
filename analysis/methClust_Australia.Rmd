@@ -13,7 +13,6 @@ library(methClust)
 library(Biobase)
 library(rasterVis)
 library(gtools)
-library(bigalgebra)
 library(sp)
 library(rgdal)
 library(ggplot2)
@@ -28,7 +27,7 @@ library(ggthemes)
 ## Plotting Maps Function
 
 ```{r}
-latlong <- get(load("../data/LatLongCells_frame.rda"))
+latlong <- readRDS("../data/LatLongCells.rds")
 ```
 
 ```{r}
@@ -61,7 +60,10 @@ base_world
 ## Extracting Australian birds presence absence data
 
 ```{r}
-latlong <- get(load("../data/LatLongCells_frame.rda"))
+latlong_pre <- readRDS("../data/LatLongCells.rds")
+tmp1 <- as.numeric(sapply(latlong_pre, function(x) return(strsplit(x, "_")[[1]][1])))
+tmp2 <- as.numeric(sapply(latlong_pre, function(x) return(strsplit(x, "_")[[1]][2])))
+latlong <- cbind.data.frame(tmp1, tmp2)
 ```
 
 ```{r}
@@ -105,6 +107,18 @@ PlotAssemblageIdx(500)
 PlotAssemblageIdx(700)
 PlotAssemblageIdx(800)
 ```
+
+```{r fig.height=7, fig.width = 8}
+richness <- rowSums(birds_pa_data_3)
+layout(matrix(1:2, nrow=2), widths = c(1), heights = c(0.2, 1), FALSE) 
+  # Plot legend first on top.
+  plot(c(0, 1), c(0, 0.05), type = 'n', axes = F, xlab = '', ylab = '',  cex.main=0.5)
+  legend_image <- as.raster(matrix(colorGradient, nrow = 1))
+  rasterImage(legend_image, 0, 0, 1, 1)
+#plot(latlong[,1], latlong[,2], col = colorGradient[richness], pch = 20)
+  plot(latlong2[,1], latlong2[,2], col= colorGradient[richness], pch = 20, cex = 5)
+```
+
 
 ## Application of methClust and visualization
 

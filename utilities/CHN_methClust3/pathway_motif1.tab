@@ -1,0 +1,5 @@
+p-value	q-value	pathway	source	external_id	members_input_overlap	members_input_overlap_geneids	size	effective_size
+8.62025092426e-05	0.0012068351294	Formation of the cornified envelope	Reactome	R-HSA-6809371	LCE3D; LCE3E; LCE5A	353145; 254910; 84648	70	70
+0.000479586716862	0.00335710701803	Keratinization	Reactome	R-HSA-6805567	LCE3D; LCE3E; LCE5A	353145; 254910; 84648	125	125
+0.00176714339534	0.00824666917824	Developmental Biology	Reactome	R-HSA-1266738	LCE3D; LCE3E; FOXP1; APBB1IP; LCE5A	54518; 353145; 27086; 84648; 254910	748	745
+0.00509216930804	0.0178225925781	SLC-mediated transmembrane transport	Reactome	R-HSA-425407	SLCO4C1; SLC24A2; NDC1	25769; 55706; 353189	286	285

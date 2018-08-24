@@ -13,7 +13,6 @@ library(methClust)
 library(Biobase)
 library(rasterVis)
 library(gtools)
-library(bigalgebra)
 library(sp)
 library(rgdal)
 library(ggplot2)
@@ -62,12 +61,17 @@ base_world
 ## Extracting Indian birds presence absence data
 
 ```{r}
-latlong <- get(load("../data/LatLongCells_frame.rda"))
+latlong_chars <- readRDS("../data/LatLongCells.rds")
+latlong <- cbind.data.frame(
+  as.numeric(sapply(latlong_chars, function(x) strsplit(x, "_")[[1]][1])),
+  as.numeric(sapply(latlong_chars, function(x) strsplit(x, "_")[[1]][2])))
+colnames(latlong) <- c("lat", "long")
+#latlong <- get(load("../data/LatLongCells_frame.rda"))
 ```
 
 ```{r}
-idx1 <- which(latlong[,2] > -10 & latlong[,2] < 45)
-idx2 <- which(latlong[,1] > 65 & latlong[,1] < 100)
+idx1 <- which(latlong[,2] > 5 & latlong[,2] < 50)
+idx2 <- which(latlong[,1] > 50 & latlong[,1] < 120)
 idx <- intersect(idx1, idx2)
 length(idx)
 latlong2 <- latlong[idx,]
@@ -77,6 +81,8 @@ latlong2 <- latlong[idx,]
 birds_pa_data <- readRDS("../data/birds_presab_land_breeding_counts.rds")
 birds_pa_data_2 <- birds_pa_data[idx, ]
 birds_pa_data_3 <- birds_pa_data_2[, which(colSums(birds_pa_data_2) > 30)]
+rownames(birds_pa_data_3) <- paste0(latlong2[,1], "_", latlong2[,2])
+save(birds_pa_data_3, file = "../../ecostructure/data/indian_birds_pa.rda")
 ```
 
 ```{r}

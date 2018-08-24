@@ -1,0 +1,4 @@
+p-value	q-value	pathway	source	external_id	members_input_overlap	members_input_overlap_geneids	size	effective_size
+0.00620127160815	0.0769995478161	Synthesis of PIPs at the plasma membrane	Reactome	R-HSA-1660499	PLEKHA5; INPP4B	8821; 54477	50	50
+0.00694516244696	0.0769995478161	Apoptotic execution  phase	Reactome	R-HSA-75153	SATB1; KPNA1	3836; 6304	53	53
+0.00933723340828	0.0769995478161	mRNA Splicing - Major Pathway	Reactome	R-HSA-72163	CWC27; SNRNP27; ELAVL2	1993; 10283; 11017	185	185
