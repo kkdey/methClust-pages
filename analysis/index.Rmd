@@ -51,6 +51,7 @@ Also, when restricted to the presence absence data of bird species , along the W
 
 The top bird species that drive the clusters - [Wallacea](wallace_line_driving_birds.html), [Australia](Australia_driving_birds.html).
 
+- [Clines vs clusters problem in Himalayan data](clines_clusters_problem.html)
 
 ## General methClust applications (methylation examples)
 
